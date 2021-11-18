@@ -33,4 +33,21 @@ export default class Client extends djs.Client {
 
         this.cooldowns = new Map();
     }
+
+    public async start(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                resolve;
+            } catch (error) {
+
+                reject(error);   
+
+            } finally {
+
+                resolve();
+
+            }
+
+        });
+    }
 }

@@ -92,14 +92,14 @@ export default class Logger {
         if(!existsSync(this.folderLogsPath))
             mkdir(this.folderLogsPath);
 
-        return createWriteStream(`${this.folderLogsPath}/${this.displayFilePrefix()}${(level === LoggerLevel.error) ? '-error' : ''}.log`, { flags: 'a' });
+        return createWriteStream(`${this.folderLogsPath}/${this.formatFilePrefix()}${(level === LoggerLevel.error) ? '-error' : ''}.log`, { flags: 'a' });
     }
 
     /**
      * Gets the prefix file by actual date like: `06-11-2021`
      * @returns { string } string - The prefix of file log.
      */
-    private displayFilePrefix(): string {
+    private formatFilePrefix(): string {
         return `${moment().subtract(10, 'days').calendar().replaceAll('/', '-')}`;
     }
 
