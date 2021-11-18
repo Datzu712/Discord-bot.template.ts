@@ -3,5 +3,7 @@ declare namespace NodeJS {
         BOT_TOKEN: string;
         
         MONGODB_URL: string;
+
+        BOT_PREFIX: string;
     }
 }
