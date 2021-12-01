@@ -4,7 +4,8 @@
   "description": "A template of a Discord bot made in TypeScript.",
   "main": "src/index.ts",
   "scripts": {
-    "eslint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
+    "eslint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+      "build": "tsc -p ."
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
     "@sentry/node": "^6.15.0",
     "@types/fs-extra": "^9.0.13",
     "discord.js": "^13.3.1",
+    "dotenv": "^10.0.0",
     "eslint": "^8.2.0",
     "fs-extra": "^10.0.0",
     "moment": "^2.29.1"
