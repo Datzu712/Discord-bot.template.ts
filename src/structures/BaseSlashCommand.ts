@@ -5,18 +5,27 @@ import Client from '../core/Client';
 import { CommandInteraction, Message } from 'discord.js';
 
 export interface IBaseSlashCommand extends ICommand {
-    options: SlashCommandBuilder;
+    builder: SlashCommandBuilder;
     execute(interaction: CommandInteraction): Promise<void>;
 }
 
 export default class SlashCommand extends BaseCommand implements IBaseSlashCommand {
 
-    public readonly type: CommandTypes;
+    static readonly type: CommandTypes = 'SLASH_COMMAND';
+    public data: ICommand['data'];
+    public builder: SlashCommandBuilder;
 
-    public constructor(public readonly client: Client, public data: ICommand['data'], public readonly options: SlashCommandBuilder) {
+    public constructor(public readonly client: Client, data?: ICommand['data'], builder?: SlashCommandBuilder) {
         super(client, data);
+        console.log(this.builder);
+        if(!data && !this.data || !builder && !this.builder) {
+            throw new Error(`${(!data && !this.builder) ? 'Data' : 'builder'} is a required parameter, is marked optional only for decorators.`);
+        }
+            
 
-        this.type = 'SLASH_COMMAND';
+
+        this.data = data;
+        this.builder = builder;
     }
 
     public send(messageOptions: unknown): Promise<Message> {

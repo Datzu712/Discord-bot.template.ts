@@ -55,7 +55,7 @@ export interface ICommand {
         aliases?: string[];
 
         /** Command category */
-        category?: string | Category;
+        category: string | Category;
     }
     execute(args: ExecuteCommandOptions | CommandInteraction): Promise<void>;
     send(messageOptions: unknown): Promise<Message>;
@@ -63,7 +63,10 @@ export interface ICommand {
 
 export class BaseCommand implements ICommand {
 
-    public readonly type: CommandTypes;
+    /** Command type. Please don't edit it. */
+    static readonly type: CommandTypes = 'TEXT_COMMAND';
+
+    /** Command data, */
     public data: ICommand['data'];
 
     /**
@@ -74,8 +77,6 @@ export class BaseCommand implements ICommand {
     public constructor(public readonly client: Client, data?: ICommand['data']) {
         if(!data)
             throw new Error('Command data is required. This param is marked optional only for decorators.');
-
-        this.type = 'TEXT_COMMAND';
 
         this.data = data;
     }
