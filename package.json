@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "eslint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-      "build": "tsc -p ."
+    "build": "tsc -p ."
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,8 @@
     "dotenv": "^10.0.0",
     "eslint": "^8.2.0",
     "fs-extra": "^10.0.0",
-    "moment": "^2.29.1"
+    "moment": "^2.29.1",
+    "ts-node": "^10.4.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.4.0"

@@ -1,7 +1,16 @@
-import { Message, PermissionString } from 'discord.js';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Message, PermissionString, CommandInteraction } from 'discord.js';
 import { PathLike } from 'fs-extra';
 import Client from '../core/Client';
 import Category from './Category';
+
+export type CommandTypes = 'SLASH_COMMAND' | 'TEXT_COMMAND';
+
+export interface ExecuteCommandOptions {
+    args: string[];
+    prefixUsed?: string;
+    msg: Message;
+}
 
 export interface ICommand {
     data: {
@@ -48,15 +57,35 @@ export interface ICommand {
         /** Command category */
         category?: string | Category;
     }
-    execute(args: unknown): Promise<void>;
+    execute(args: ExecuteCommandOptions | CommandInteraction): Promise<void>;
     send(messageOptions: unknown): Promise<Message>;
 }
 
-export abstract class BaseCommand implements ICommand {
+export class BaseCommand implements ICommand {
 
-    public constructor(public client: Client, public data: ICommand['data']) {}
+    public readonly type: CommandTypes;
+    public data: ICommand['data'];
 
-    public abstract execute(args: unknown): Promise<void>;
-    public abstract send(messageOptions: unknown): Promise<Message>;
-    
+    /**
+     * Construct new command.
+     * @param { client } client - Client instance. 
+     * @param { ICommand['data'] } data - Command data. (REQUIRED)
+     */
+    public constructor(public readonly client: Client, data?: ICommand['data']) {
+        if(!data)
+            throw new Error('Command data is required. This param is marked optional only for decorators.');
+
+        this.type = 'TEXT_COMMAND';
+
+        this.data = data;
+    }
+    public send(messageOptions: unknown): Promise<Message<boolean>> {
+        throw new Error('Method not implemented.');
+    }
+
+    public execute(args: ExecuteCommandOptions | CommandInteraction): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+
+
 }
