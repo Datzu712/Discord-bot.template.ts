@@ -77,7 +77,7 @@ class CommandManager extends Map<string, BaseCommand | SlashCommand> {
                     }
 
                     if(this.debug)
-                        this.client.logger.debug(`Command ${command.data.name} was imported.`, 'CommandManager');
+                        this.client.logger.debug(`${(CommandClass.default.type === 'TEXT_COMMAND') ? 'Command' : 'Slash command'} ${command.data.name} was imported.`, 'CommandManager');
 
                 }
                 this.client.logger.info(`Command ${this.size} imported.`, 'CommandManager');

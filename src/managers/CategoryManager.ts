@@ -82,7 +82,7 @@ class CategoryManager extends Map<string, ICategory> {
 
                 category.subcategory = subcategory;
                 if(this.debug)
-                    this.client.logger.debug(`Subcategory ${subcategory.name} of ${name} imported.`, 'CategoryManager');
+                    this.client.logger.debug(`Subcategory ${subcategory.name[0]} of ${name} imported.`, 'CategoryManager');
 
             }
 

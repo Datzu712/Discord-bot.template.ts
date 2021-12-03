@@ -9,3 +9,5 @@ const bot = new Client({
 bot.setup()
     .then((client) => client.login(process.env.BOT_TOKEN))
     .catch((err) => bot.logger.error(err, 'client_login'));
+
+process.on('unhandledRejection', (err: Error) => bot.logger.error(err, 'unhandled_rejection'));

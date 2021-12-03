@@ -2,7 +2,7 @@ import djs from 'discord.js';
 import Logger from './Logger';
 import CategoryManager from '../managers/CategoryManager';
 import CommandManager from '../managers/CommandManager';
-//import Mongodb from '../database/mongoose';
+import Mongodb from '../database/mongoose';
 import EventManager from '../managers/EventManager';
 import { resolve } from 'path';
 
@@ -22,7 +22,7 @@ class Client extends djs.Client {
             : false;
             
         this.logger = new Logger(resolve(`${__dirname}/../../logs`));
-        this.logger.setTextTemplate('[<dateNow>]  [<level>] [<serviceName>]  <message>`');
+        this.logger.setTextTemplate('[<dateNow>] [<level>] [<serviceName>] - `<message>`');
 
         this.commands = new CommandManager(this, debugMode);
         this.categories = new CategoryManager(this, debugMode);
@@ -35,7 +35,7 @@ class Client extends djs.Client {
             await Promise.all([
                 this.commands.importCommands(resolve(`${__dirname}/../commands`)), 
                 this.categories.importCategories(resolve(`${__dirname}/../categories`)),
-                // Mongodb.connect(this.logger),
+                Mongodb.connect(this.logger),
                 this.events.importEvents(resolve(`${__dirname}/../events`))
             ]).then(() => this.categories.syncCommands())
                 .catch(err => this.logger.error(err, 'client'));

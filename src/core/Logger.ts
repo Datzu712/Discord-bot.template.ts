@@ -86,7 +86,6 @@ export default class Logger {
      * @returns { WriteStream } WriteStream - The file log.
      */
     private getFileLog(level: LoggerLevel): WriteStream {
-                
         if(!existsSync(this.folderLogsPath))
             mkdir(this.folderLogsPath);
         

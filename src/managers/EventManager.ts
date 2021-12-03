@@ -45,13 +45,13 @@ class EventManager {
                     this.client.on(event.name as keyof ClientEvents, (...args: unknown[]) => event.execute({ ...args }));
 
                     if(this.debug)
-                        this.client.logger.info(`Imported djs event ${event.name}`);
+                        this.client.logger.info(`Imported djs event ${event.name}`, 'EventManager');
 
                 } else if(event.type) {
                     // Other events
                 }
             }
-            this.client.logger.info(`Imported ${files.length} events.`);
+            this.client.logger.info(`Imported ${files.length} events.`, 'EventManager');
             return Promise.resolve();
         } catch (error) {
             return Promise.reject(error);
