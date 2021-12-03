@@ -13,7 +13,7 @@ import { CommandInteraction } from 'discord.js';
     guildOnly: false,
     aliases: ['test']
 })
-export class testCommand extends SlashCommand {
+export default class testCommand extends SlashCommand {
 
     public async execute(interaction: CommandInteraction): Promise<void> {
         return interaction.reply('test');

@@ -12,7 +12,7 @@ process.on("unhandledRejection", (error: Error) => {
     logger.error(error, 'unhandledRejection');
 });
 
-const shardManager = new ShardingManager(resolve(`${__dirname}index.js`), {
+const shardManager = new ShardingManager(resolve(`${__dirname}/index.ts`), {
     token: process.env.BOT_TOKEN,
     totalShards,
     respawn: true,

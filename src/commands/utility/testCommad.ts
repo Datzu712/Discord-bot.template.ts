@@ -9,7 +9,7 @@ import createCommand from '../../util/decorators/createCommand';
     guildOnly: false,
     aliases: ['test']
 })
-export class testCommand extends BaseCommand {
+export default class testCommand extends BaseCommand {
     public async execute({ msg }: ExecuteCommandOptions): Promise<void> {
         return void msg.channel.send('test');
     }

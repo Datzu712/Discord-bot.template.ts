@@ -1,9 +1,10 @@
 import Client from '../core/Client';
-import { BaseCommand, ICommand } from '../structures/BaseCommand';
+import { BaseCommand } from '../structures/BaseCommand';
 import similarly from 'string-similarity';
 import { PathLike, readdirSync } from 'fs-extra';
+import SlashCommand from '../structures/BaseSlashCommand';
 
-class CommandManager extends Map<string, ICommand> {
+class CommandManager extends Map<string, BaseCommand | SlashCommand> {
 
     /**
      * Constructor of the CategoryManager.
@@ -20,7 +21,7 @@ class CommandManager extends Map<string, ICommand> {
      * @param { boolean } sloppy - If true, will return the first category that matches the name.
      * @returns { ICommand | null } command - Command or null.
      */
-    public get(commandName: string, sloppy?: boolean): ICommand | null {
+    public get(commandName: string, sloppy?: boolean): BaseCommand | null {
         if(!commandName)
             return null;
 
@@ -45,6 +46,8 @@ class CommandManager extends Map<string, ICommand> {
             if(folders.length === 0)
                 return Promise.reject(new Error(`No command folders was found in ${from}`));
 
+            this.client.logger.log(`Importing commands from folders ${folders.join(', ')}...`);
+
             for(const folderName of folders) {
                 const cmdFilesName = readdirSync(`${from}/${folderName}`);
                 if(cmdFilesName.length === 0) {
@@ -57,9 +60,13 @@ class CommandManager extends Map<string, ICommand> {
                         default: typeof BaseCommand 
                     } = await import(`${from}/${folderName}/${cmdFileName}`)
                         .catch((error) => this.client.logger.error(new Error(`Failed to import command ${cmdFileName}.` + error), 'CommandManager'));
-                    
-                    if(!CommandClass?.default) 
+
+                    if(!CommandClass?.default) {
+                        if(this.debug)
+                            this.client.logger.warn(`Command ${cmdFileName} is invalid.`, 'CommandManager');
                         continue;
+                    }
+                        
                     
                     const command = new CommandClass.default(this.client);
                     if(CommandClass.default.type === 'TEXT_COMMAND') {

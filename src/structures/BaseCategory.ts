@@ -7,15 +7,17 @@ export interface ICategory {
     name: [string, string];
 
     /** Category Commands. */
-    commands: Map<string, BaseCommand | BaseSlashCommand>;
+    commands?: Map<string, BaseCommand | BaseSlashCommand>;
 
     /** Category description. */
     description: string;
 
     /** Category aliases. */
-    aliases: string[];
+    aliases?: string[];
 
-    subcategory?: ICategory;
+    subcategory?: ICategory | string;
+
+    hidden?: boolean
 }
 
 export default class Category implements ICategory {
@@ -23,16 +25,18 @@ export default class Category implements ICategory {
     public name: [string, string];
 
     /** Category Commands. */
-    public commands: Map<string, BaseCommand | BaseSlashCommand>;
+    public commands?: Map<string, BaseCommand | BaseSlashCommand>;
 
     /** Category description. */
     public description: string;
 
     /** Category aliases. */
-    public aliases: string[];
+    public aliases?: string[];
 
     /** Sub category. */
-    public subcategory?: ICategory;
+    public subcategory?: ICategory | string;
+
+    public hidden?: boolean;
     
     /**
      * Create category.
@@ -40,11 +44,13 @@ export default class Category implements ICategory {
      */
     constructor(data?: ICategory) {
         this.name = data.name;
-        this.commands = data.commands;
         this.description = data.description;
-        this.aliases = data.aliases;
 
         this.subcategory = data.subcategory ?? null;
+        this.hidden = data.hidden ?? false;
+
+        this.commands = new Map();
+        this.aliases = data.aliases ?? [];
     }
 
 }

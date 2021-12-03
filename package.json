@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "eslint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "dev": "echo Shards disabled. If you want use shards, run the bot without dev script. && nodemon src/index.ts"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 import { ICommand } from '../../structures/BaseCommand'; 
 import Client from '../../core/Client';
-import Category from '../../structures/Category';
+import Category from '../../structures/BaseCategory';
 
 /** Create a new command command, use second param only for slash commands */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -8,7 +8,6 @@ export default function createCommand(data: ICommand['data']): any {
 
     if(data.category instanceof Category) 
         throw new Error(`Don't assign categories manually, only put the name of category.`);
-    
 
     if(!data.permissions)
         data.permissions = {
@@ -24,7 +23,6 @@ export default function createCommand(data: ICommand['data']): any {
     if(!data.cooldown)
         data.cooldown = null;
     
-
     /**
      * Decorator.
      * @param { Function } Function - Constructor class. BaseCommand (client, data) {}

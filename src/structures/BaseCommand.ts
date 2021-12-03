@@ -2,7 +2,7 @@
 import { Message, PermissionString, CommandInteraction } from 'discord.js';
 import { PathLike } from 'fs-extra';
 import Client from '../core/Client';
-import Category from './Category';
+import Category from './BaseCategory';
 
 export type CommandTypes = 'SLASH_COMMAND' | 'TEXT_COMMAND';
 

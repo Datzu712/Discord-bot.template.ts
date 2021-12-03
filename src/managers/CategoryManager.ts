@@ -1,7 +1,13 @@
-import Category, { ICategory } from '../structures/Category';
+import Category, { ICategory } from '../structures/BaseCategory';
 import similarly from 'string-similarity';
 import { PathLike, readdirSync } from 'fs-extra';
 import Client from '../core/Client';
+
+const unknownCategory = new Category({
+    name: ['Unknown', '404'],
+    description: 'This category is for commands that do not fit into any other category.',
+    hidden: true
+});
 
 class CategoryManager extends Map<string, ICategory> {
 
@@ -44,30 +50,42 @@ class CategoryManager extends Map<string, ICategory> {
             if(files.length === 0)
                 return Promise.reject(new Error(`No categories was found in ${from}`));
 
+
             for(const fileName of files) {
                 // Categories Classes are like: { default: [Category] }
-                const categoryClass: { 
-                    default: typeof Category;
+                const categoryContents: { 
+                    default: Category;
                 } = await import(`${from}/${fileName}`).catch((error) => this.client.logger.error(
-                    new Error(`Failed to import category ${fileName}`, error)
+                    new Error(`Failed to import category ${fileName}` + error)
                 ));
 
-                if(!categoryClass?.default)
+                if(!categoryContents?.default)
                     continue;
 
-                const category = new categoryClass.default();
-                // If the category has subcategories, set it too.
-                if(category.subcategory) {
-                    this.set(category.subcategory.name[0], category.subcategory);
-
-                    if(this.debug)
-                        this.client.logger.debug(`Category ${category.subcategory.name[0]} imported.`, 'CategoryManager');
-                }
+                const category = categoryContents.default;
 
                 this.set(category.name[0], category);
                 if(this.debug)
                     this.client.logger.debug(`Category ${category.name[0]} imported.`, 'CategoryManager');
             }
+
+            // Then of import categories, search if one of they have subcategories
+            for(const [name, category] of this) {
+                if(!category.subcategory || category.subcategory instanceof Category)
+                    continue;
+
+                let subcategory = this.get(category.subcategory as string);
+                if(!subcategory) {
+                    this.client.logger.warn(`Could not find subcategory ${category.subcategory} of ${name}, I defined it with 'unknownCategory'`, 'CategoryManager');
+                    subcategory = unknownCategory;
+                }
+
+                category.subcategory = subcategory;
+                if(this.debug)
+                    this.client.logger.debug(`Subcategory ${subcategory.name} of ${name} imported.`, 'CategoryManager');
+
+            }
+
             this.client.logger.log(`${files.length} categories imported.`, 'CategoryManager');
             return Promise.resolve();
 
@@ -96,8 +114,9 @@ class CategoryManager extends Map<string, ICategory> {
             }
 
             command.data.category = category;
+            category.commands.set(name, command);
             if(this.debug)
-                this.client.logger.debug(`Command ${name} added to category ${category.name}`, 'CategoryManager');
+                this.client.logger.debug(`Command ${name} added to category ${category.name[0]}`, 'CategoryManager');
         }
     }
 }

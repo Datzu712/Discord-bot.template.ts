@@ -29,8 +29,6 @@ export default class Logger {
             timeStyle: 'medium', 
             hour12: false 
         });
-
-        // process.on('log', (message: string) => this.log(message, 'logger'));
     }
 
     /**
@@ -91,7 +89,7 @@ export default class Logger {
                 
         if(!existsSync(this.folderLogsPath))
             mkdir(this.folderLogsPath);
-
+        
         return createWriteStream(`${this.folderLogsPath}/${this.displayFilePrefix()}${(level === LoggerLevel.error) ? '-error' : ''}.log`, { flags: 'a' });
     }
 
