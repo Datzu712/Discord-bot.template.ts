@@ -11,5 +11,7 @@ export default function slashBuilder(builder: SlashCommandBuilder): any {
             throw new Error('@slashBuilder can only be used on a SlashCommand instance.');
 
         target.prototype.builder = builder;
+
+        return;
     };
 }

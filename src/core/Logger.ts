@@ -1,13 +1,14 @@
 import { WriteStream, createWriteStream } from 'fs';
 import { existsSync, mkdir } from 'fs-extra';
 import moment from 'moment';
-import { reset, cyan, red, yellow, green } from '../util/colors';
+import { reset, cyan, red, yellow, green, magenta } from '../util/colors';
 
 export enum LoggerLevel {
     info = 1,
     warn = 2,
     error = 3,
-    log = 4
+    log = 4,
+    debug = 5,
 }
 
 export interface textTemplateOptions {
@@ -55,8 +56,6 @@ export default class Logger {
 
         console.log(`${red} ${textLog}`, reset);
         this.write(textLog, LoggerLevel.error);
-        //console.log(`${red}[${this.dateFormat.format(Date.now())}] [error] ${error.stack}`, reset);
-        //this.write(`[${this.dateFormat.format(Date.now())}] [error] ${error.stack}`, LoggerLevel.error);
     }
 
     /**
@@ -69,9 +68,6 @@ export default class Logger {
 
         console.log(`${yellow}${textLog}`, reset);
         this.write(textLog, LoggerLevel.warn);
-
-        // console.log(`${yellow}[${this.dateFormat.format(Date.now())}] [warn] ${message}`, reset);
-        // this.write(`[${this.dateFormat.format(Date.now())}] [warn] ${message}`, LoggerLevel.warn);
     }
 
     /**
@@ -84,9 +80,6 @@ export default class Logger {
 
         console.log(`${cyan}${textLog}`, reset);
         this.write(textLog, LoggerLevel.info);
-
-        // console.log(`${cyan}[${this.dateFormat.format(Date.now())}] [info] ${message}`, reset);
-        // this.write(`[${this.dateFormat.format(Date.now())}] [info] ${message}`, LoggerLevel.info);
     }
 
     /**
@@ -113,9 +106,6 @@ export default class Logger {
     
         console.log(`${green}${textLog}`, reset);
         this.write(textLog, LoggerLevel.log);
-
-        //console.log(`${green}[${this.dateFormat.format(Date.now())}] ${service} [log] ${message}`, reset);
-        //this.write(`[${this.dateFormat.format(Date.now())}] ${service} [log] ${message}`, LoggerLevel.log);
     }
 
     /**
@@ -147,5 +137,12 @@ export default class Logger {
      */
     public setTextTemplate(textTemplate: string): void {
         this.textTemplate = textTemplate;
+    }
+
+    public debug(message: string, serviceName?: string): void {
+        const textLog = this.resolveTextLog({ message, level: LoggerLevel.debug, serviceName });
+
+        console.log(`${magenta}${textLog}`, reset);
+        this.write(textLog, LoggerLevel.debug);
     }
 }

@@ -36,6 +36,9 @@ declare namespace NodeJS {
 
         /** Discord bot shard config. */
         CLIENT_SHARD_CONFIG: string;
+
+        /** Client mode. */
+        CLIENT_MODE: 'production' | 'development';
     }
 }
 

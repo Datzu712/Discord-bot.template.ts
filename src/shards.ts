@@ -12,18 +12,21 @@ process.on("unhandledRejection", (error: Error) => {
     logger.error(error, 'unhandledRejection');
 });
 
-const shards = new ShardingManager(resolve(`${__dirname}index.js`), {
+const shardManager = new ShardingManager(resolve(`${__dirname}index.js`), {
     token: process.env.BOT_TOKEN,
     totalShards,
     respawn: true,
     mode: 'process'
 });
 
-shards.on('shardCreate', (shard) => {
+shardManager.on('shardCreate', (shard) => {
     logger.info(`Shard ${shard.id} created`, 'ShardManager');
 
     shard
         .on('disconnect', () => logger.warn(`Shard ${shard.id} disconnected`, 'ShardManager'))
         .on('reconnecting', () => logger.warn(`Shard ${shard.id} reconnecting`, 'ShardManager'))
         .on('error', (error) => logger.error(error, 'ShardManager'));
-}).spawn({ amount: totalShards }).catch((error) => logger.error(error, 'ShardManager'));
+
+}).spawn({ amount: totalShards })
+    .catch((error) => logger.error(error, 'ShardManager'))
+    .then(() => logger.info(`Shards ${shardManager.shards.size}/${totalShards} spawned.`, 'ShardManager'));

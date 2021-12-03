@@ -18,7 +18,7 @@ export interface ICategory {
     subcategory?: ICategory;
 }
 
-export default abstract class Category implements ICategory {
+export default class Category implements ICategory {
     /** Category name. [name, emoji (For help commands xd)] */
     public name: [string, string];
 
@@ -34,7 +34,11 @@ export default abstract class Category implements ICategory {
     /** Sub category. */
     public subcategory?: ICategory;
     
-    constructor(data: ICategory) {
+    /**
+     * Create category.
+     * @param { ICategory } data - Category data.
+     */
+    constructor(data?: ICategory) {
         this.name = data.name;
         this.commands = data.commands;
         this.description = data.description;
