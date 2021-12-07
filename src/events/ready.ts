@@ -7,6 +7,6 @@ import BaseEvent from '../structures/BaseEvent';
 })
 export default class ReadyEvent extends BaseEvent {
     public execute(): void {
-        this.client.logger.log(`${this.client.user.tag} is ready!`);
+        this.client.logger.log(`${this.client.user?.tag} is ready!`);
     }
 }

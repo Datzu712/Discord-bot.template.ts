@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Message, PermissionString, CommandInteraction } from 'discord.js';
+import { Message, PermissionString, CommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import { PathLike } from 'fs-extra';
 import Client from '../core/Client';
 import Category from './BaseCategory';
@@ -18,9 +18,9 @@ export interface ICommand {
         name: string;
 
         /** Command cooldown .*/
-        cooldown?: number;
+        cooldown?: number | null;
 
-        /** Command disabled. True for disabled (globally) the command. */
+        /** Command status. True for disabled (globally) the command. */
         disabled?: boolean;
 
         permissions?: {
@@ -30,63 +30,69 @@ export interface ICommand {
             /** Bot permissions. */
             me?: PermissionString[],
 
-            /** Evaluate if the member is on a voice channel */
+            /** Require member voice connection. */
             requireVoiceConnection?: boolean,
 
-            /** This is for custom permissions in guilds. */
+            /** Custom command permissions */
             experimentalCustomPermissions?: boolean
         }
-        /** If the command is only for developers */
+        /** If the command is only for developers. */
         devOnly?: boolean;
 
-        /** If the command only use in guilds */
+        /** If the command only use in guilds. */
         guildOnly?: boolean;
 
         /** Command description */
         description: string;
 
-        /** Command usage */
+        /** Command usage. */
         usage?: string;
 
-        /** Command path */
+        /** Command path. */
         path?: PathLike;
 
-        /** Command aliases */
+        /** Command aliases. */
         aliases?: string[];
 
-        /** Command category */
+        /** Command category. */
         category: string | Category;
     }
     execute(args: ExecuteCommandOptions | CommandInteraction): Promise<void>;
-    send(messageOptions: unknown): Promise<Message>;
+    // send(messageOptions: unknown): Promise<Message>;
 }
 
-export class BaseCommand implements ICommand {
+export abstract class BaseCommand implements ICommand {
 
     /** Command type. Please don't edit it. */
     static readonly type: CommandTypes = 'TEXT_COMMAND';
 
-    /** Command data, */
-    public data: ICommand['data'];
-
     /**
      * Construct new command.
      * @param { client } client - Client instance. 
-     * @param { ICommand['data'] } data - Command data. (REQUIRED)
+     * @param { ICommand['data'] } data - Command data.
      */
-    public constructor(public readonly client: Client, data?: ICommand['data']) {
-        if(!data)
-            throw new Error('Command data is required. This param is marked optional only for decorators.');
-
-        this.data = data;
-    }
-    public send(messageOptions: unknown): Promise<Message<boolean>> {
+    public constructor(public readonly client: Client, public data: ICommand['data']) {}
+    
+    /*public send(messageOptions: unknown): Promise<Message<boolean>> {
         throw new Error('Method not implemented.');
-    }
+    }*/
 
     public execute(args: ExecuteCommandOptions | CommandInteraction): Promise<void> {
         throw new Error('Method not implemented.');
     }
 
+    /**
+     * Check permissions 
+     * @param param0 
+     * @returns 
+     */
+    public checkPermissions({ channel, member }: { member?: GuildMember; channel?: TextChannel }): boolean {
+        
+        const data = this.data;
+        if(data.disabled === true || (data.guildOnly === true && !channel))
+            return false;
+            
 
+        return true;
+    }
 }

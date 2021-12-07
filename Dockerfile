@@ -8,4 +8,4 @@ RUN npm install
 
 COPY . .
 
-CMD [ "sudo ./run.sh" ]
+CMD [ "./run.sh" ]

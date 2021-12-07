@@ -4,8 +4,8 @@ import similarly from 'string-similarity';
 import { PathLike, readdirSync } from 'fs-extra';
 import SlashCommand from '../structures/BaseSlashCommand';
 
+// TODO: Maybe extend by Set than Map?
 class CommandManager extends Map<string, BaseCommand | SlashCommand> {
-
     /**
      * Constructor of the CategoryManager.
      * @param { Client } client - Client instance.
@@ -21,16 +21,15 @@ class CommandManager extends Map<string, BaseCommand | SlashCommand> {
      * @param { boolean } sloppy - If true, will return the first category that matches the name.
      * @returns { ICommand | null } command - Command or null.
      */
-    public get(commandName: string, sloppy?: boolean): BaseCommand | null {
+    public get(commandName: string, sloppy?: boolean): BaseCommand | undefined {
         if(!commandName)
-            return null;
+            return undefined;
 
-        if(sloppy === true && !this.has(commandName)) {
+        if(sloppy === true && !this.has(commandName))
             commandName = similarly.findBestMatch(commandName, Array.from(this.keys())).bestMatch.target;
-        }
-        return super.get(commandName ?? null);
-    }
 
+        return super.get(commandName) ?? undefined;
+    }
     /**
      * Import commands (without category)and setup it in this manager.
      * @param { PathLike } from - Path of commands folders.
@@ -38,47 +37,60 @@ class CommandManager extends Map<string, BaseCommand | SlashCommand> {
      */
     public async importCommands(from: PathLike): Promise<void>  {
         try {
-            /*
-                Command folder names
-                ['dev', 'general', 'fun', 'music'];
+            /** 
+            *  Command folder names like:
+            *  ['dev', 'general', 'fun', 'music'];
             */
-            const folders = readdirSync(from);
+            const folders: string[] = readdirSync(from);
             if(folders.length === 0)
-                return Promise.reject(new Error(`No command folders was found in ${from}`));
+                return Promise.reject(new Error(`Not command folders was found in ${from}`));
 
-            this.client.logger.log(`Importing commands from folders ${folders.join(', ')}...`);
+            this.client.logger.log(`Importing commands from folders ${folders.join(', ')}...`, 'CommandManager');
 
             for(const folderName of folders) {
-                const cmdFilesName = readdirSync(`${from}/${folderName}`);
+                /**
+                 * Get commands files from folders like:
+                 * ['ban.ts', 'kick.ts', 'clear.ts']
+                 */
+                const cmdFilesName: string[] = readdirSync(`${from}/${folderName}`);
                 if(cmdFilesName.length === 0) {
-                    this.client.logger.warn(`No commands was found in ${from}/${folderName}`, 'CommandManager');
+                    this.client.logger.warn(`Not commands was found in ${from}/${folderName}`, 'CommandManager');
                     continue;
                 }
-                
                 for(const cmdFileName of cmdFilesName) {
-                    const CommandClass: { 
-                        default: typeof BaseCommand 
+                    /*
+                        Command: { default: [BaseCommand] };
+                        When you create commands, you need to export it by default.
+                        If some error occurs (.catch) CommandClass is converted in undefined and we handle the error and continue registering commands.
+                    */
+                    const Command: { 
+                        default: { type: 'TEXT_COMMAND' | 'SLASH_COMMAND' } & (new (client: Client) => BaseCommand)
                     } = await import(`${from}/${folderName}/${cmdFileName}`)
                         .catch((error) => this.client.logger.error(new Error(`Failed to import command ${cmdFileName}.` + error), 'CommandManager'));
 
-                    if(!CommandClass?.default) {
-                        if(this.debug)
-                            this.client.logger.warn(`Command ${cmdFileName} is invalid.`, 'CommandManager');
+                    if(!Command?.default) {
+                        this.client.logger.warn(`Command ${cmdFileName} is invalid.`, 'CommandManager');
                         continue;
                     }
-                        
-                    
-                    const command = new CommandClass.default(this.client);
-                    if(CommandClass.default.type === 'TEXT_COMMAND') {
+                    const command = new Command.default(this.client);
+                    command.data.path = `${from}/${folderName}/${cmdFileName}`;
+                    /*
+                        Slash commands is registered with '/slashCommandName' like:
+                        Map(4) {
+                            '/ban': [SlashCommand],
+                            '/kick': [SlashCommand],
+                            'ban': [BaseCommand],
+                            'kick': [BaseCommand],
+                        }
+                    */
+                    if(Command.default.type === 'TEXT_COMMAND') {
                         this.set(command.data.name, command);
                     } else {
                         // Slash commands is added with the key '/' like ["/slashCommandName", [SlashCommand]]
                         this.set(`/${command.data.name}`, command);
                     }
-
                     if(this.debug)
-                        this.client.logger.debug(`${(CommandClass.default.type === 'TEXT_COMMAND') ? 'Command' : 'Slash command'} ${command.data.name} was imported.`, 'CommandManager');
-
+                        this.client.logger.debug(`${(Command.default.type === 'TEXT_COMMAND') ? 'Command' : 'Slash command'} ${command.data.name} was imported.`, 'CommandManager');
                 }
                 this.client.logger.info(`Command ${this.size} imported.`, 'CommandManager');
             }
@@ -87,5 +99,4 @@ class CommandManager extends Map<string, BaseCommand | SlashCommand> {
         }
     }
 }
-
 export default CommandManager;

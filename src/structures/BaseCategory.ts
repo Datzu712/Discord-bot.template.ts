@@ -15,7 +15,7 @@ export interface ICategory {
     /** Category aliases. */
     aliases?: string[];
 
-    subcategory?: ICategory | string;
+    subcategory?: ICategory | string | null;
 
     hidden?: boolean
 }
@@ -34,7 +34,7 @@ export default class Category implements ICategory {
     public aliases?: string[];
 
     /** Sub category. */
-    public subcategory?: ICategory | string;
+    public subcategory?: ICategory | string | null;
 
     public hidden?: boolean;
     
@@ -42,7 +42,7 @@ export default class Category implements ICategory {
      * Create category.
      * @param { ICategory } data - Category data.
      */
-    constructor(data?: ICategory) {
+    constructor(data: ICategory) {
         this.name = data.name;
         this.description = data.description;
 

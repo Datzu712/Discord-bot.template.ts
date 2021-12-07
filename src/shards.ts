@@ -8,19 +8,17 @@ const logger = new Logger('../logs');
 
 const totalShards = (process.env.CLIENT_SHARD_CONFIG === 'auto') ? 'auto' : parseInt(process.env.CLIENT_SHARD_CONFIG);
 
-process.on("unhandledRejection", (error: Error) => {
-    logger.error(error, 'unhandledRejection');
-});
-
-const shardManager = new ShardingManager(resolve(`${__dirname}/index.ts`), {
+const shardManager = new ShardingManager(resolve(`${__dirname}/index.js`), {
     token: process.env.BOT_TOKEN,
     totalShards,
     respawn: true,
     mode: 'process'
 });
 
+logger.info(`Creating shards...`, 'ShardManager');
+
 shardManager.on('shardCreate', (shard) => {
-    logger.info(`Shard ${shard.id} created`, 'ShardManager');
+    logger.info(`Shard ${shard.id} created. ${shardManager.shards.size}/${totalShards}`, 'ShardManager');
 
     shard
         .on('disconnect', () => logger.warn(`Shard ${shard.id} disconnected`, 'ShardManager'))

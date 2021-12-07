@@ -2,7 +2,7 @@ import djs from 'discord.js';
 import Logger from './Logger';
 import CategoryManager from '../managers/CategoryManager';
 import CommandManager from '../managers/CommandManager';
-import Mongodb from '../database/mongoose';
+// import Mongodb from '../database/mongoose';
 import EventManager from '../managers/EventManager';
 import { resolve } from 'path';
 
@@ -11,7 +11,7 @@ class Client extends djs.Client {
     public readonly commands: CommandManager;
     public readonly categories: CategoryManager;
     public readonly logger: Logger;
-    public webhook: djs.WebhookClient;
+    // public webhook: djs.WebhookClient;
     private readonly events: EventManager;
 
     constructor(options: djs.ClientOptions) {
@@ -35,8 +35,9 @@ class Client extends djs.Client {
             await Promise.all([
                 this.commands.importCommands(resolve(`${__dirname}/../commands`)), 
                 this.categories.importCategories(resolve(`${__dirname}/../categories`)),
-                Mongodb.connect(this.logger),
+                //Mongodb.connect(this.logger),
                 this.events.importEvents(resolve(`${__dirname}/../events`))
+                
             ]).then(() => this.categories.syncCommands())
                 .catch(err => this.logger.error(err, 'client'));
 

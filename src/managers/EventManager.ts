@@ -4,13 +4,14 @@ import { ClientEvents } from  'discord.js';
 import BaseEvent from '../structures/BaseEvent';
 
 // Events types here, like discord.js, distube or others
-export type EventsTypes = 'djs' | 'dbBackup';
+export type EventsTypes = 'djs' | 'dbBackup' | 'timers';
 
 // custom events here
-export interface events extends ClientEvents {
-    example: [unknown];
+interface extendedEvents extends ClientEvents {
+    example: [test: unknown];
 }
 
+export type events = keyof extendedEvents;
 
 /** Load discord.js events and custom events, like distube etc... */
 class EventManager {
@@ -23,33 +24,41 @@ class EventManager {
 
     public async importEvents(from: PathLike) {
         try {
-            // ['ready.ts', 'messageCreate.ts', ...]
+            /**
+             * Events files names.
+             * ['ready.ts', 'messageCreate.ts', 'customEvent.ts'];
+             */
             const files: string[] = readdirSync(from);
             if(files.length === 0)
                 return Promise.reject(new Error('Could not find events files.'));
     
             for(const fileName of files) {
-                const eventClass: { 
-                    default: typeof BaseEvent 
+                /*
+                    Event: { default: [BaseEvent] };
+                    When you create events, you need to export it by default.
+                    If some error occurs (.catch) BaseEvent is converted in undefined and we handle the error and continue registering events.
+                */
+                const Event: { 
+                    default: { type: EventsTypes } & (new (client: Client) => BaseEvent);
                 } = await import(`${from}/${fileName}`)
                     .catch((error) => this.client.logger.error(
                         new Error(`Failed to import category ${fileName}` + error)
                     ));
-    
-                if(!eventClass?.default)
+
+                if(!Event?.default)
                     continue;
 
-                const event = new eventClass.default(this.client);
-
+                const event = new Event.default(this.client);
                 if(event.type === 'djs') {
-                    this.client.on(event.name as keyof ClientEvents, (...args: unknown[]) => event.execute({ ...args }));
+                    this.client.on(event.name as keyof ClientEvents, (...args: unknown[]) => event.execute(...args));
 
                     if(this.debug)
                         this.client.logger.info(`Imported djs event ${event.name}`, 'EventManager');
 
                 } else if(event.type) {
                     // Other events
-                }
+                } else 
+                    this.client.logger.warn(`Unknown event type ${event.type} in ${from}/${fileName}`, 'EventManager');
             }
             this.client.logger.info(`Imported ${files.length} events.`, 'EventManager');
             return Promise.resolve();
@@ -58,5 +67,4 @@ class EventManager {
         }
     }
 }
-
 export default EventManager;

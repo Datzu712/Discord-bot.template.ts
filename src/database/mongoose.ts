@@ -4,7 +4,8 @@ import Logger from '../core/Logger';
 export default class Mongodb {
     static connect = (logger: Logger) => {
 
-        const before = Date.now();
+        const before = 
+            Date.now();
 
         try {
             mongoose.connect(process.env.MONGODB_URL, {
@@ -22,8 +23,9 @@ export default class Mongodb {
     
                     logger.info(`Connected ${mongoose.connection.user} with MongoDb with ${ping}ms`, 'mongoose');
                 });
-        } catch (error) {
-            logger.error(error, 'mongoose');
+
+        } catch (err) {
+            logger.error((err instanceof Error) ? err : new Error(err as string), 'mongoose');
         }
         
     };

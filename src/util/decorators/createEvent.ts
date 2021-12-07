@@ -6,7 +6,8 @@ import BaseEvent, {
 
 /** Create a new command command, use second param only for slash commands */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function createCommand({ name, type }: { name: keyof events, type: EventsTypes }): any {
+export default function createCommand({ name, type }: { name:  events, type: EventsTypes }): any {
+
     /**
      * Decorator.
      * @param { Function } Function - Constructor class. BaseEvent (client, type, name) {}

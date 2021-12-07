@@ -4,13 +4,13 @@ import { PathLike, readdirSync } from 'fs-extra';
 import Client from '../core/Client';
 
 const unknownCategory = new Category({
-    name: ['Unknown', '404'],
-    description: 'This category is for commands that do not fit into any other category.',
+    name: ['Unknown', '📕'],
+    description: 'Commands with unknown category.',
     hidden: true
 });
 
+// TODO: Maybe extend by Set than Map?
 class CategoryManager extends Map<string, ICategory> {
-
     /**
      * Constructor of the CategoryManager.
      * @param { Client } client - Client instance.
@@ -26,14 +26,14 @@ class CategoryManager extends Map<string, ICategory> {
      * @param { boolean } sloppy - If true, will return the first category that matches the name.
      * @returns { ICategory | undefined } Category.
      */
-    public get(nameCategory: string, sloppy?: boolean): ICategory | null {
+    public get(nameCategory: string, sloppy?: boolean): ICategory | undefined {
         if(!nameCategory)
-            return null;
+            return undefined;
 
         if(sloppy === true && !this.has(nameCategory)) {
             nameCategory = similarly.findBestMatch(nameCategory, Array.from(this.keys())).bestMatch.target;
         }
-        return super.get(nameCategory ?? null);
+        return super.get(nameCategory) ?? undefined;
     }
 
     /**
@@ -43,27 +43,31 @@ class CategoryManager extends Map<string, ICategory> {
     public async importCategories(from: PathLike): Promise<void> {
         try {
             /*
-                Categories filenames
+                Categories file names like:
                 ['dev.ts', 'fun.ts', 'moderation.ts', 'music.ts', 'utility.ts', ...];
             */
             const files = readdirSync(from);
             if(files.length === 0)
-                return Promise.reject(new Error(`No categories was found in ${from}`));
-
+                return Promise.reject(new Error(`Not categories was found in ${from}`));
 
             for(const fileName of files) {
-                // Categories Classes are like: { default: [Category] }
-                const categoryContents: { 
+                /*
+                    Category: { default: [Category] };
+                    When you create categories, you need to export it by default and instanced (new Category...).
+                    If some error occurs (.catch) CommandClass is converted in undefined and we handle the error and continue registering categories.
+                */
+                const Category: { 
                     default: Category;
-                } = await import(`${from}/${fileName}`).catch((error) => this.client.logger.error(
-                    new Error(`Failed to import category ${fileName}` + error)
-                ));
+                } = await import(`${from}/${fileName}`)
+                    .catch((error) => this.client.logger.error(
+                        new Error(`Failed to import category ${fileName}` + error)
+                    ));
 
-                if(!categoryContents?.default)
+                if(!Category?.default)
                     continue;
 
-                const category = categoryContents.default;
-
+                // Add category to this map.
+                const category = Category.default;
                 this.set(category.name[0], category);
                 if(this.debug)
                     this.client.logger.debug(`Category ${category.name[0]} imported.`, 'CategoryManager');
@@ -79,21 +83,16 @@ class CategoryManager extends Map<string, ICategory> {
                     this.client.logger.warn(`Could not find subcategory ${category.subcategory} of ${name}, I defined it with 'unknownCategory'`, 'CategoryManager');
                     subcategory = unknownCategory;
                 }
-
                 category.subcategory = subcategory;
                 if(this.debug)
                     this.client.logger.debug(`Subcategory ${subcategory.name[0]} of ${name} imported.`, 'CategoryManager');
-
             }
-
             this.client.logger.log(`${files.length} categories imported.`, 'CategoryManager');
             return Promise.resolve();
-
         } catch (error) {
             return Promise.reject(error);
         }
     }
-
     /**
      * Sync commands with categories.
      */
@@ -112,13 +111,16 @@ class CategoryManager extends Map<string, ICategory> {
                 this.client.logger.warn(`Could not find the category ${command.data.category} of ${name}`, 'CategoryManager');
                 continue;
             }
-
             command.data.category = category;
+            if(!category.commands) {
+                category.commands = new Map();
+                continue;
+            }
+               
             category.commands.set(name, command);
             if(this.debug)
                 this.client.logger.debug(`Command ${name} added to category ${category.name[0]}`, 'CategoryManager');
         }
     }
 }
-
 export default CategoryManager;

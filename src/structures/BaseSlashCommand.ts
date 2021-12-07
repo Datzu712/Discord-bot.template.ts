@@ -15,13 +15,9 @@ export default class SlashCommand extends BaseCommand implements IBaseSlashComma
     public data: ICommand['data'];
     public builder: SlashCommandBuilder;
 
-    public constructor(public readonly client: Client, data?: ICommand['data'], builder?: SlashCommandBuilder) {
+    public constructor(public readonly client: Client, data: ICommand['data'], builder: SlashCommandBuilder) {
         super(client, data);
 
-        if(!data && !this.data || !builder && !this.builder) {
-            throw new Error(`${(!data && !this.builder) ? 'Data' : 'builder'} is a required parameter, is marked optional only for decorators.`);
-        }
-            
         this.data = data;
         this.builder = builder;
     }
