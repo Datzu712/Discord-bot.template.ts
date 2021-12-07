@@ -10,7 +10,6 @@ export interface IBaseSlashCommand extends ICommand {
 }
 
 export default class SlashCommand extends BaseCommand implements IBaseSlashCommand {
-
     static readonly type: CommandTypes = 'SLASH_COMMAND';
     public data: ICommand['data'];
     public builder: SlashCommandBuilder;

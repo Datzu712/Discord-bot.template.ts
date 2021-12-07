@@ -1,7 +1,7 @@
-import BaseSlashCommand from "./BaseSlashCommand";
-import { BaseCommand } from "./BaseCommand";
+import BaseSlashCommand from './BaseSlashCommand';
+import { BaseCommand } from './BaseCommand';
 
-// TODO adjust Sub categories 
+// TODO adjust Sub categories
 export interface ICategory {
     /** Category name. [name, emoji (For help commands xd)] */
     name: [string, string];
@@ -17,7 +17,7 @@ export interface ICategory {
 
     subcategory?: ICategory | string | null;
 
-    hidden?: boolean
+    hidden?: boolean;
 }
 
 export default class Category implements ICategory {
@@ -37,7 +37,7 @@ export default class Category implements ICategory {
     public subcategory?: ICategory | string | null;
 
     public hidden?: boolean;
-    
+
     /**
      * Create category.
      * @param { ICategory } data - Category data.
@@ -51,6 +51,6 @@ export default class Category implements ICategory {
 
         this.commands = new Map();
         this.aliases = data.aliases ?? [];
+        this.hidden = data.hidden ?? false;
     }
-
 }

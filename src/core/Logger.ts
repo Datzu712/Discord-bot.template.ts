@@ -19,36 +19,33 @@ export interface textTemplateOptions {
 }
 
 export default class Logger {
-
     public dateFormat: Intl.DateTimeFormat;
     public textTemplate = `[<dateNow>] [<serviceName>] [<level>] <message>`;
 
     constructor(public folderLogsPath: string, public notifier?: LikeFunction<void>) {
-        this.dateFormat = Intl.DateTimeFormat('en', { 
-            dateStyle: 'short', 
-            timeStyle: 'medium', 
-            hour12: false 
+        this.dateFormat = Intl.DateTimeFormat('en', {
+            dateStyle: 'short',
+            timeStyle: 'medium',
+            hour12: false,
         });
     }
 
     /**
-    * Write a 'log' level log.
-    * @param { string } message - The message to log.
-    * @param { LoggerLevel } level - The level of the log.
-    */
+     * Write a 'log' level log.
+     * @param { string } message - The message to log.
+     * @param { LoggerLevel } level - The level of the log.
+     */
     private write(message: string, level: LoggerLevel): void {
         const file = this.getFileLog(level);
         file.write(`${message}\n`);
     }
 
     /**
-    * Write an `error` level log.
-    * @param { Error } Error - The Error to log.
-    */
+     * Write an `error` level log.
+     * @param { Error } Error - The Error to log.
+     */
     public error(error: Error, service?: string): void {
-        
-        if(this.notifier)
-            this.notifier(error);
+        if (this.notifier) this.notifier(error);
 
         const textLog = this.resolveTextLog({ error, level: LoggerLevel.error, serviceName: service });
 
@@ -57,11 +54,10 @@ export default class Logger {
     }
 
     /**
-    * Write a `warn` level log.
-    * @param { string } message - The message to log.
-    */
+     * Write a `warn` level log.
+     * @param { string } message - The message to log.
+     */
     public warn(message: string, serviceName?: string): void {
-
         const textLog = this.resolveTextLog({ message, level: LoggerLevel.warn, serviceName });
 
         console.log(`${yellow}${textLog}`, reset);
@@ -73,7 +69,6 @@ export default class Logger {
      * @param { string } message - The message to log.
      */
     public info(message: string, serviceName?: string): void {
-
         const textLog = this.resolveTextLog({ message, level: LoggerLevel.info, serviceName });
 
         console.log(`${cyan}${textLog}`, reset);
@@ -86,21 +81,22 @@ export default class Logger {
      * @returns { WriteStream } WriteStream - The file log.
      */
     private getFileLog(level: LoggerLevel): WriteStream {
-        if(!existsSync(this.folderLogsPath))
-            mkdir(this.folderLogsPath);
-        
-        return createWriteStream(`${this.folderLogsPath}/${this.displayFilePrefix()}${(level === LoggerLevel.error) ? '-error' : ''}.log`, { flags: 'a' });
+        if (!existsSync(this.folderLogsPath)) mkdir(this.folderLogsPath);
+
+        return createWriteStream(
+            `${this.folderLogsPath}/${this.displayFilePrefix()}${level === LoggerLevel.error ? '-error' : ''}.log`,
+            { flags: 'a' },
+        );
     }
 
     /**
      * Write a `log` level log.
-     * @param { string } string - Message to write. 
+     * @param { string } string - Message to write.
      * @param { string } service - Name of the service.
      */
     public log(message: string, serviceName?: string): void {
-
         const textLog = this.resolveTextLog({ message, level: LoggerLevel.log, serviceName });
-    
+
         console.log(`${green}${textLog}`, reset);
         this.write(textLog, LoggerLevel.log);
     }
@@ -115,7 +111,7 @@ export default class Logger {
 
     /**
      * Create a text log.
-     * @param { textTemplateOptions } options - Text template config options. 
+     * @param { textTemplateOptions } options - Text template config options.
      * @returns { string } string - The converted text log.
      */
     private resolveTextLog(log: textTemplateOptions): string {
@@ -125,7 +121,6 @@ export default class Logger {
             .replaceAll('<level>', LoggerLevel[log.level])
             .replaceAll('<message>', `${log.error?.stack ?? log.message}`);
     }
-
 
     /**
      * Set the actual text template to use it in the logs.

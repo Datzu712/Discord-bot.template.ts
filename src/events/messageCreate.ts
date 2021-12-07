@@ -4,7 +4,7 @@ import { Message } from 'discord.js';
 
 @createEvent({
     name: 'messageCreate',
-    type: 'djs'
+    type: 'djs',
 })
 export default class MessageCreate extends BaseEvent {
     public async execute(message: Message) {

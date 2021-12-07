@@ -25,17 +25,17 @@ export interface ICommand {
 
         permissions?: {
             /** Member permissions. (Text channel) */
-            member?: PermissionString[],
+            member?: PermissionString[];
 
             /** Bot permissions. */
-            me?: PermissionString[],
+            me?: PermissionString[];
 
             /** Require member voice connection. */
-            requireVoiceConnection?: boolean,
+            requireVoiceConnection?: boolean;
 
             /** Custom command permissions */
-            experimentalCustomPermissions?: boolean
-        }
+            experimentalCustomPermissions?: boolean;
+        };
         /** If the command is only for developers. */
         devOnly?: boolean;
 
@@ -56,23 +56,22 @@ export interface ICommand {
 
         /** Command category. */
         category: string | Category;
-    }
+    };
     execute(args: ExecuteCommandOptions | CommandInteraction): Promise<void>;
     // send(messageOptions: unknown): Promise<Message>;
 }
 
 export abstract class BaseCommand implements ICommand {
-
     /** Command type. Please don't edit it. */
     static readonly type: CommandTypes = 'TEXT_COMMAND';
 
     /**
      * Construct new command.
-     * @param { client } client - Client instance. 
+     * @param { client } client - Client instance.
      * @param { ICommand['data'] } data - Command data.
      */
     public constructor(public readonly client: Client, public data: ICommand['data']) {}
-    
+
     /*public send(messageOptions: unknown): Promise<Message<boolean>> {
         throw new Error('Method not implemented.');
     }*/
@@ -82,16 +81,14 @@ export abstract class BaseCommand implements ICommand {
     }
 
     /**
-     * Check permissions 
-     * @param param0 
-     * @returns 
+     * Check permissions.
+     * @param param0
+     * @returns
      */
     public checkPermissions({ channel, member }: { member?: GuildMember; channel?: TextChannel }): boolean {
-        
-        const data = this.data;
-        if(data.disabled === true || (data.guildOnly === true && !channel))
-            return false;
-            
+        // (Remove this validation if you want) Developers can skip permissions to execute commands with -f at least argument (prefix.command arg1 arg2 -f).
+
+        if (this.data.disabled === true || (this.data.guildOnly === true && !channel)) return false;
 
         return true;
     }

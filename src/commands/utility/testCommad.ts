@@ -7,7 +7,7 @@ import createCommand from '../../util/decorators/createCommand';
     category: 'test',
     usage: 'test',
     guildOnly: false,
-    aliases: ['test']
+    aliases: ['test'],
 })
 export default class testCommand extends BaseCommand {
     public async execute({ msg }: ExecuteCommandOptions): Promise<void> {

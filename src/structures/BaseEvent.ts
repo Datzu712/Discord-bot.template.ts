@@ -9,9 +9,8 @@ export interface IEvent {
 }
 
 class BaseEvent implements IEvent {
-    
     constructor(public client: Client, public type: EventsTypes, public name: events) {}
-    
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public execute(...args: unknown[]): void {
         throw new Error('Event not implemented');

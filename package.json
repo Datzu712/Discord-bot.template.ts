@@ -4,11 +4,15 @@
   "description": "A template of a Discord bot made in TypeScript.",
   "main": "src/index.ts",
   "scripts": {
-    "eslint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "eslint": "eslint 'src/**/*.ts'",
+    "eslint:fix": "eslint --fix 'src/**/*.ts'",
+    "prettier": "prettier 'src/**/*.ts'",
+    "prettier:fix": "prettier --write 'src/**/*.ts'",
     "build": "tsc -p .",
     "dev": "echo Shards disabled. If you want use shards, run the bot without dev script. && nodemon src/index.ts",
     "build:start": "npm run build && npm start",
-    "start": "node dist/shards.js"
+    "start": "node dist/shards.js",
+    "check": "npm run eslint && npm run prettier"
   },
   "repository": {
     "type": "git",
@@ -35,6 +39,8 @@
   },
   "devDependencies": {
     "@types/string-similarity": "^4.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.4.0"
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0"
   }
 }
