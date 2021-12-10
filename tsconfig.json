@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "declaration": true,
         "alwaysStrict": true,
         "strict": true,
         "experimentalDecorators": true,
@@ -18,7 +19,7 @@
         "baseUrl": ".",
         "skipDefaultLibCheck": true,
         "typeRoots": [
-            "src/typings",
+            "src/typings/global.d.ts",
             "node_modules/@types"
         ],
         "paths": {
@@ -34,6 +35,6 @@
         "src/typings/global.d.ts"
     ],
     "include": [
-        "src/**/*.ts"
-    ]
+        "src/**/*"
+    ],
 }

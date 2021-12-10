@@ -4,7 +4,7 @@ import { PathLike } from 'fs-extra';
 import Client from '../core/Client';
 import Category from './BaseCategory';
 
-export type CommandTypes = 'SLASH_COMMAND' | 'TEXT_COMMAND';
+export type CommandTypes = 'SLASH_COMMAND' | 'CHANNEL_COMMAND';
 
 export interface ExecuteCommandOptions {
     args: string[];
@@ -12,7 +12,7 @@ export interface ExecuteCommandOptions {
     msg: Message;
 }
 
-export interface ICommand {
+export interface IBaseCommand {
     data: {
         /** Command name. */
         name: string;
@@ -39,7 +39,7 @@ export interface ICommand {
         /** If the command is only for developers. */
         devOnly?: boolean;
 
-        /** If the command only use in guilds. */
+        /** The Command can only execute in server. */
         guildOnly?: boolean;
 
         /** Command description */
@@ -48,7 +48,7 @@ export interface ICommand {
         /** Command usage. */
         usage?: string;
 
-        /** Command path. */
+        /** Command file path. */
         path?: PathLike;
 
         /** Command aliases. */
@@ -57,39 +57,27 @@ export interface ICommand {
         /** Command category. */
         category: string | Category;
     };
-    execute(args: ExecuteCommandOptions | CommandInteraction): Promise<void>;
-    // send(messageOptions: unknown): Promise<Message>;
+    execute(...args: unknown[]): Promise<unknown>;
+    checkPermissions(...args: unknown[]): boolean;
 }
 
-export abstract class BaseCommand implements ICommand {
-    /** Command type. Please don't edit it. */
-    static readonly type: CommandTypes = 'TEXT_COMMAND';
+export abstract class BaseCommand implements IBaseCommand {
+    /** Command type. (Disable slash command decorator). */
+    static readonly type: CommandTypes;
 
     /**
      * Construct new command.
      * @param { client } client - Client instance.
      * @param { ICommand['data'] } data - Command data.
      */
-    public constructor(public readonly client: Client, public data: ICommand['data']) {}
-
-    /*public send(messageOptions: unknown): Promise<Message<boolean>> {
-        throw new Error('Method not implemented.');
-    }*/
-
-    public execute(args: ExecuteCommandOptions | CommandInteraction): Promise<void> {
-        throw new Error('Method not implemented.');
-    }
+    public constructor(protected readonly client: Client, public data: IBaseCommand['data']) {}
 
     /**
-     * Check permissions.
-     * @param param0
+     * Execute command.
+     * @param { unknown } args - Command arguments.
      * @returns
      */
-    public checkPermissions({ channel, member }: { member?: GuildMember; channel?: TextChannel }): boolean {
-        // (Remove this validation if you want) Developers can skip permissions to execute commands with -f at least argument (prefix.command arg1 arg2 -f).
+    abstract execute(...args: unknown[]): Promise<unknown>;
 
-        if (this.data.disabled === true || (this.data.guildOnly === true && !channel)) return false;
-
-        return true;
-    }
+    abstract checkPermissions(...args: unknown[]): boolean;
 }

@@ -1,6 +1,7 @@
 import { WriteStream, createWriteStream } from 'fs';
 import { existsSync, mkdir } from 'fs-extra';
 import moment from 'moment';
+// import { LikeFunction } from '../typings/global';
 import { reset, cyan, red, yellow, green, magenta } from '../util/colors';
 
 export enum LoggerLevel {
@@ -19,9 +20,10 @@ export interface textTemplateOptions {
 }
 
 export default class Logger {
-    public dateFormat: Intl.DateTimeFormat;
-    public textTemplate = `[<dateNow>] [<serviceName>] [<level>] <message>`;
+    private dateFormat: Intl.DateTimeFormat;
+    private textTemplate = `[<dateNow>] [<serviceName>] [<level>] <message>`;
 
+    ///<reference path="global.d.ts">
     constructor(public folderLogsPath: string, public notifier?: LikeFunction<void>) {
         this.dateFormat = Intl.DateTimeFormat('en', {
             dateStyle: 'short',
@@ -84,7 +86,9 @@ export default class Logger {
         if (!existsSync(this.folderLogsPath)) mkdir(this.folderLogsPath);
 
         return createWriteStream(
-            `${this.folderLogsPath}/${this.displayFilePrefix()}${level === LoggerLevel.error ? '-error' : ''}.log`,
+            `${this.folderLogsPath}/${moment().format('l').replaceAll('/', '-')}${
+                level === LoggerLevel.error ? '-error' : ''
+            }.log`,
             { flags: 'a' },
         );
     }
@@ -99,14 +103,6 @@ export default class Logger {
 
         console.log(`${green}${textLog}`, reset);
         this.write(textLog, LoggerLevel.log);
-    }
-
-    /**
-     * Gets the prefix file by actual date like: `06-11-2021`
-     * @returns { string } string - The prefix of file log.
-     */
-    private displayFilePrefix(): string {
-        return `${moment().subtract(10, 'days').calendar().replaceAll('/', '-')}`;
     }
 
     /**

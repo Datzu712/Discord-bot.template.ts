@@ -8,8 +8,8 @@ export interface IEvent {
     execute(...args: unknown[]): void;
 }
 
-class BaseEvent implements IEvent {
-    constructor(public client: Client, public type: EventsTypes, public name: events) {}
+abstract class BaseEvent implements IEvent {
+    public constructor(public client: Client, public type: EventsTypes, public name: events) {}
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public execute(...args: unknown[]): void {

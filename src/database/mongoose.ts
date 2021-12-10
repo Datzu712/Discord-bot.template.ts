@@ -4,9 +4,8 @@ import Logger from '../core/Logger';
 export default class Mongodb {
     static connect = (logger: Logger) => {
         const before = Date.now();
-
         try {
-            mongoose.connect(process.env.MONGODB_URL, {
+            mongoose.connect(process.env.MONGODB_URL as string, {
                 maxPoolSize: 7,
                 autoIndex: false,
             });
@@ -18,7 +17,7 @@ export default class Mongodb {
                         mongoose.connection.db.admin().ping(() => resolve(Date.now() - before));
                     });
 
-                    logger.info(`Connected ${mongoose.connection.user} with MongoDb with ${ping}ms`, 'mongoose');
+                    logger.info(`Connected to MongoDb with ${ping}ms`, 'mongoose');
                 });
         } catch (err) {
             logger.error(err instanceof Error ? err : new Error(err as string), 'mongoose');

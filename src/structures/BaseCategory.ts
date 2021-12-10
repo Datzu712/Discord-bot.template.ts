@@ -42,7 +42,7 @@ export default class Category implements ICategory {
      * Create category.
      * @param { ICategory } data - Category data.
      */
-    constructor(data: ICategory) {
+    public constructor(data: ICategory) {
         this.name = data.name;
         this.description = data.description;
 

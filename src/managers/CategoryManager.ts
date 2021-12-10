@@ -4,7 +4,7 @@ import { PathLike, readdirSync } from 'fs-extra';
 import Client from '../core/Client';
 
 const unknownCategory = new Category({
-    name: ['Unknown', '📕'],
+    name: ['unknown', '📕'],
     description: 'Commands with unknown category.',
     hidden: true,
 });

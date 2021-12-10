@@ -37,9 +37,3 @@ declare namespace NodeJS {
         CLIENT_MODE: 'production' | 'development';
     }
 }
-
-/*declare module 'discord.js' {
-    export interface Guild {
-        queue: unknown | null;
-    }
-}*/

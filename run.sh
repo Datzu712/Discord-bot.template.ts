@@ -1,11 +1,14 @@
-#!/bin/bash 
+#!/bin/bash
 
-mode=`cat .env | grep APP_MODE= | sed s/APP_MODE=//`
+mode=`cat .env | grep CLIENT_MODE= | sed s/CLIENT_MODE=//`
 
-if [ "$mode" == "development" ]; then
-    echo "Running in development mode"
+echo $mode
+
+if [ $mode == "development" ]; then
+    npm i -g nodemon
+    echo "[bot] Running in development mode"
     npm run dev
 else
-    echo "Running in production mode"
+    echo "[bot] Running in production mode"
     npm run build:start
 fi;
