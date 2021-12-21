@@ -1,0 +1,23 @@
+{
+        "root": true,
+        "parser": "@typescript-eslint/parser",
+        "plugins": [
+        "@typescript-eslint",
+        "prettier"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "prettier"
+    ],
+    "rules": {
+        "array-callback-return": 1,
+        "semi": ["error", "always"],
+        "@typescript-eslint/indent": ["error", 4],
+        "@typescript-eslint/no-unused-vars": "error",
+        "@typescript-eslint/no-explicit-any": "error",
+        "prettier/prettier": 2,
+        "indent": ["error", 4]
+    }
+}

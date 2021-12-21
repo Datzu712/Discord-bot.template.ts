@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  
+  # API container configuration
+  bot:
+    container_name: bot
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped # restart if it is stopped
+    volumes:
+      - ./:/bot/
+    links:
+      - botdb
+      #- /api/node_modules
+
+  # Mongodb container configuration
+  botdb:
+    image: mongo:5.0
+    container_name: botdb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=botdb
+    ports:
+      - 27027:27017
+    expose:
+      - 27017
+    #volumes:
+      #- ./storage:/data/db

@@ -1,0 +1,50 @@
+{
+  "name": "template-discord-bot.git",
+  "version": "0.0.1",
+  "description": "A template of a Discord bot made in TypeScript.",
+  "main": "src/index.ts",
+  "scripts": {
+    "eslint": "eslint 'src/**/*.ts'",
+    "eslint:fix": "eslint --fix 'src/**/*.ts'",
+    "prettier": "prettier 'src/**/*.ts'",
+    "prettier:fix": "prettier --write 'src/**/*.ts'",
+    "build": "tsc -p .",
+    "dev": "echo Shards disabled. If you want use shards, run the bot without dev script. && nodemon src/index.ts",
+    "build:start": "npm run build && npm start",
+    "start": "node dist/shards.js",
+    "check": "npm run eslint && npm run prettier"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Datzu712/Discord_bot-TS.git"
+  },
+  "author": "Datzu712",
+  "license": "MIT License",
+  "bugs": {
+    "url": "https://github.com/Datzu712/Discord_bot-TS/issues"
+  },
+  "homepage": "https://github.com/Datzu712/Discord_bot-TS#readme",
+  "dependencies": {
+    "discord.js": "^13.3.1",
+    "dotenv": "^10.0.0",
+    "eslint": "^8.2.0",
+    "fs-extra": "^10.0.0",
+    "js-beautify": "^1.14.0",
+    "moment": "^2.29.1",
+    "mongoose": "^6.0.14",
+    "npm": "^8.2.0",
+    "reflect-metadata": "^0.1.13",
+    "sourcebin": "^4.2.5",
+    "string-similarity": "^4.0.4"
+  },
+  "devDependencies": {
+    "@sentry/node": "^6.15.0",
+    "@types/fs-extra": "^9.0.13",
+    "@types/js-beautify": "^1.13.3",
+    "@types/string-similarity": "^4.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "ts-node": "^10.4.0"
+  }
+}

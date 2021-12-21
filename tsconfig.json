@@ -1,0 +1,40 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "alwaysStrict": true,
+        "strict": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "module": "CommonJS",
+        "esModuleInterop": true,
+        "target": "ES2021",
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "removeComments": true,
+        "lib": [
+            "ES2021"
+        ],
+        "baseUrl": ".",
+        "skipDefaultLibCheck": true,
+        "typeRoots": [
+            "src/typings/global.d.ts",
+            "node_modules/@types"
+        ],
+        "paths": {
+            "*": [
+                "node_modules/*"
+            ]
+        },
+    },
+    "ts-node": {
+        "files": true,
+    },
+    "files": [
+        "src/typings/global.d.ts"
+    ],
+    "include": [
+        "src/**/*"
+    ],
+}
