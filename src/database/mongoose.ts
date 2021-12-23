@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import Logger from '../core/Logger';
 
 export default class Mongodb {
-    static connect = (logger: Logger) => {
+    static connect = (logger?: Logger) => {
         const before = Date.now();
         try {
             mongoose.connect(process.env.MONGODB_URL as string, {
@@ -11,16 +11,16 @@ export default class Mongodb {
             });
 
             mongoose.connection
-                .on('error', (error) => logger.error(error, 'mongoose'))
+                .on('error', (error) => logger?.error(error, 'mongoose'))
                 .on('open', async () => {
                     const ping: number = await new Promise((resolve) => {
                         mongoose.connection.db.admin().ping(() => resolve(Date.now() - before));
                     });
 
-                    logger.info(`Connected to MongoDb with ${ping}ms`, 'mongoose');
+                    logger?.info(`Connected to MongoDb with ${ping}ms`, 'mongoose');
                 });
         } catch (err) {
-            logger.error(err instanceof Error ? err : new Error(err as string), 'mongoose');
+            logger?.error(err instanceof Error ? err : new Error(err as string), 'mongoose');
         }
     };
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 import { Message, MessageEmbed } from 'discord.js';
 import { ChannelCommand } from '../../structures/ChannelCommand';
 import createCommand from '../../util/decorators/createCommand';
@@ -30,10 +31,10 @@ export default class testCommand extends ChannelCommand {
             );
 
             input = input.replaceAll('--async', '');
-            const output = util.inspect(await eval(input), {
-                depth: 0,
-                maxStringLength: 2000,
-            });
+            let output = await eval(input);
+            if (typeof output !== 'string')
+                output = util.inspect(output, { depth: 0, maxStringLength: 4000, maxArrayLength: 3000 });
+
             const baseEmbed = new MessageEmbed()
                 .setColor('BLUE')
                 .addField(
@@ -60,12 +61,18 @@ export default class testCommand extends ChannelCommand {
             } else if (output.length <= 4000) {
                 return msg.channel.send({
                     embeds: [
-                        new MessageEmbed()
-                            .setColor('BLUE')
-                            .setDescription(
-                                `📤 Output (${Date.now() - startTime}ms) \n` +
-                                    `\`\`\`js\n${this.client.utils.replaceBannedWords(output)}\n\`\`\``,
-                            ),
+                        new MessageEmbed().setColor('BLUE').setDescription(
+                            `${
+                                input.length <= 500
+                                    ? `📥 Input ${`\`\`\`js\n${beautify(input, {
+                                          indent_size: 4,
+                                          space_in_empty_paren: true,
+                                          jslint_happy: true,
+                                      })}\n\`\`\``}`
+                                    : ''
+                            }📤 **Output (${Date.now() - startTime}ms)**\n` +
+                                `\`\`\`js\n${this.client.utils.replaceBannedWords(output)}\n\`\`\``,
+                        ),
                     ],
                     content: null,
                 });

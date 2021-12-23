@@ -98,7 +98,10 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                         }
                     */
 
-                    // Slash commands is added with the key '/' like ["/slashCommandName", [SlashCommand]]
+                    /* 
+                        Slash commands is added with the key '/' like ["/slashCommandName", [SlashCommand]] 
+                        Some commands are declared like slash and channel command with the same name.
+                    */
                     this.set(
                         Command.default.type === 'SLASH_COMMAND' ? `/${command.data.name}` : command.data.name,
                         command,
@@ -128,17 +131,16 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
     public async handle(context: Message | CommandInteraction, prefix: string): Promise<void> {
         const startTime = Date.now();
         try {
-            // To search slash commands, we need to add the prefix '/'. (Result: /{slashCommandName})
+            // To search slash commands, we need to add the prefix '/'. (like: /{slashCommandName})
             const command = this.get(
                 context instanceof CommandInteraction
                     ? `/${context.commandName}`
                     : context.content.slice(prefix?.length).split(' ')[0],
                 false,
             ) as BaseCommand;
-            if (!command) return;
 
             if (context instanceof Message && !context.content.startsWith(prefix)) return;
-            if (!command.checkPermissions(context)) return;
+            if (!command?.checkPermissions(context)) return;
 
             if (!command.execute)
                 return this.client.logger.warn(
