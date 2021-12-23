@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { BaseChannelCommand } from '../../structures/BaseChannelCommand';
+import { ChannelCommand } from '../../structures/ChannelCommand';
 import createCommand from '../../util/decorators/createCommand';
 
 @createCommand({
@@ -10,7 +10,7 @@ import createCommand from '../../util/decorators/createCommand';
     guildOnly: false,
     aliases: ['test'],
 })
-export default class testCommand extends BaseChannelCommand {
+export default class testCommand extends ChannelCommand {
     public async execute(msg: Message): Promise<void> {
         return void msg.channel.send('test');
     }

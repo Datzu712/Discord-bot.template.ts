@@ -1,4 +1,4 @@
-import BaseSlashCommand from './BaseSlashCommand';
+import BaseSlashCommand from './SlashCommand';
 import { BaseCommand } from './BaseCommand';
 
 // TODO adjust Sub categories

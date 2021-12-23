@@ -13,6 +13,7 @@ declare type RequireAtLeastOneOf<T, Keys extends keyof T = keyof T> = Pick<T, Ex
         [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>;
     }[Keys];
 
+
 declare namespace NodeJS {
     export interface ProcessEnv {
         /** Discord bot token. */

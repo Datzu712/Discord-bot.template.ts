@@ -20,7 +20,9 @@ export default class MessageCreate extends BaseEvent {
         const prefixes: string[] = [
             message.guild?.prefix ?? process.env.DEFAULT_BOT_PREFIX,
             `<@!${this.client.user?.id}> `,
+            `<@${this.client.user?.id}> `,
         ];
+        console.log(message.content);
         // If some user mentioned the bot, the bot will reply with the guild prefix.
         const regMention = new RegExp(`^<@!?${this.client.user?.id}>( |)$`);
         if (message.content.match(regMention))

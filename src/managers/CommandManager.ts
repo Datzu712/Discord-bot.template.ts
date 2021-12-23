@@ -1,13 +1,13 @@
 import Client from '../core/Client';
-import { BaseChannelCommand } from '../structures/BaseChannelCommand';
+import { ChannelCommand } from '../structures/ChannelCommand';
 import similarly from 'string-similarity';
 import { PathLike, readdirSync } from 'fs-extra';
-import SlashCommand from '../structures/BaseSlashCommand';
+import SlashCommand from '../structures/SlashCommand';
 import { CommandInteraction, Message } from 'discord.js';
 import { BaseCommand, CommandTypes } from '../structures/BaseCommand';
 
 // TODO: Maybe extend by Set than Map?
-class CommandManager extends Map<string, BaseChannelCommand | SlashCommand> {
+class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
     /**
      * Constructor of the CategoryManager.
      * @param { Client } client - Client instance.
@@ -23,19 +23,18 @@ class CommandManager extends Map<string, BaseChannelCommand | SlashCommand> {
      * @param { boolean } sloppy - If true, will return the first category that matches the name.
      * @returns { ICommand | null } command or null.
      */
-    public get(name: string, sloppy?: boolean): BaseChannelCommand | SlashCommand | undefined {
-        if (!name) return undefined;
+    public get(name: string, sloppy?: boolean): ChannelCommand | SlashCommand | undefined {
+        let command = super.get(name);
 
-        if (sloppy === true && !this.has(name))
-            name = similarly.findBestMatch(name, Array.from(this.keys())).bestMatch.target;
+        if (sloppy && !command)
+            command = super.get(similarly.findBestMatch(name, Array.from(this.keys())).bestMatch.target);
 
-        if (!name) {
-            this.forEach((command: BaseCommand, key) => {
-                if (command.data.aliases?.includes(name)) name = key;
+        if (!command) {
+            this.forEach((cmd: BaseCommand) => {
+                if (cmd.data.aliases?.includes(name) && !command) command = super.get(cmd.data.name);
             });
         }
-
-        return super.get(name) ?? undefined;
+        return command ?? undefined;
     }
     /**
      * Import commands (without category)and setup it in this manager.
@@ -49,7 +48,7 @@ class CommandManager extends Map<string, BaseChannelCommand | SlashCommand> {
              *  ['dev', 'general', 'fun', 'music'];
              */
             const folders = readdirSync(from);
-            if (folders.length === 0) return Promise.reject(new Error(`Not command folders was found in ${from}`));
+            if (folders.length === 0) throw new Error(`Not command folders was found in ${from}`);
 
             this.client.logger.log(`Importing commands from folders ${folders.join(', ')}...`, 'CommandManager');
 
@@ -70,7 +69,12 @@ class CommandManager extends Map<string, BaseChannelCommand | SlashCommand> {
                         If some error occurs (.catch) CommandClass is converted in undefined and we handle the error and continue registering commands.
                     */
                     const Command: {
-                        default: { type: CommandTypes } & (new (client: Client) => BaseChannelCommand);
+                        // ChannelCommand {
+                        //     default: [BaseCommand],
+                        //     type: CommandTypes
+                        // };
+                        //}
+                        default: { type: CommandTypes } & (new (client: Client) => ChannelCommand | SlashCommand);
                     } = await import(`${from}/${folderName}/${cmdFileName}`).catch((error) =>
                         this.client.logger.error(
                             new Error(`Failed to import command ${cmdFileName}. ` + error),
@@ -93,12 +97,13 @@ class CommandManager extends Map<string, BaseChannelCommand | SlashCommand> {
                             'kick': [BaseCommand],
                         }
                     */
-                    if (Command.default.type === 'CHANNEL_COMMAND') {
-                        this.set(command.data.name, command);
-                    } else {
-                        // Slash commands is added with the key '/' like ["/slashCommandName", [SlashCommand]]
-                        this.set(`/${command.data.name}`, command);
-                    }
+
+                    // Slash commands is added with the key '/' like ["/slashCommandName", [SlashCommand]]
+                    this.set(
+                        Command.default.type === 'SLASH_COMMAND' ? `/${command.data.name}` : command.data.name,
+                        command,
+                    );
+
                     if (this.debug)
                         this.client.logger.debug(
                             `${Command.default.type === 'CHANNEL_COMMAND' ? 'Command' : 'Slash command'} ${
@@ -141,7 +146,7 @@ class CommandManager extends Map<string, BaseChannelCommand | SlashCommand> {
                     'CommandManager',
                 );
 
-            // Channel commands need arguments in the second parameter...
+            // Channel commands need arguments in the second parameter (args)...
             await command
                 .execute(
                     context,

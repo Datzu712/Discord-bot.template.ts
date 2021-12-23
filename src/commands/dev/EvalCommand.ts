@@ -1,5 +1,5 @@
 import { Message, MessageEmbed } from 'discord.js';
-import { BaseChannelCommand } from '../../structures/BaseChannelCommand';
+import { ChannelCommand } from '../../structures/ChannelCommand';
 import createCommand from '../../util/decorators/createCommand';
 import util from 'util';
 import beautify from 'js-beautify';
@@ -7,13 +7,13 @@ import beautify from 'js-beautify';
 @createCommand({
     name: 'eval',
     description: 'Evaluates code.',
-    category: 'dev',
+    category: 'test',
     usage: 'eval [code]',
     guildOnly: true,
     aliases: ['e'],
     devOnly: true,
 })
-export default class testCommand extends BaseChannelCommand {
+export default class testCommand extends ChannelCommand {
     public async execute(msg: Message, args: string[]): Promise<Message> {
         const startTime = Date.now();
 
@@ -25,7 +25,7 @@ export default class testCommand extends BaseChannelCommand {
             let input = '';
             args.forEach((arg) =>
                 arg === '--async'
-                    ? (input = `(async () => { ${args.slice(0).join(' ')} })()`)
+                    ? (input = `(async () => { ${args.slice(0).join(' ')} })();`)
                     : (input = args.slice(0).join(' ')),
             );
 

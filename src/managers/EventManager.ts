@@ -55,8 +55,7 @@ class EventManager {
                 } else
                     this.client.logger.warn(`Unknown event type ${event.type} in ${from}/${fileName}`, 'EventManager');
             }
-            this.client.logger.info(`Imported ${files.length} events.`, 'EventManager');
-            return Promise.resolve();
+            return this.client.logger.info(`Imported ${files.length} events.`, 'EventManager');
         } catch (error) {
             return Promise.reject(error);
         }

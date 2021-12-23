@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandTypes } from '../../structures/BaseCommand';
-import BaseSlashCommand from '../../structures/BaseSlashCommand';
+import BaseSlashCommand from '../../structures/SlashCommand';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default function slashBuilder(builder: SlashCommandBuilder): any {
