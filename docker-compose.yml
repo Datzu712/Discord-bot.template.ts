@@ -10,7 +10,8 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped # restart if it is stopped
     volumes:
-      - ./:/bot/
+      - ./src/:/bot/src/
+      - ./.env:/bot/.env
     links:
       - botdb
       #- /api/node_modules

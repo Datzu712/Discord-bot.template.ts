@@ -46,7 +46,7 @@ class CategoryManager extends Map<string, ICategory> {
                 ['dev.ts', 'fun.ts', 'moderation.ts', 'music.ts', 'utility.ts', ...];
             */
             const files = readdirSync(from);
-            if (files.length === 0) return Promise.reject(new Error(`Not categories was found in ${from}`));
+            if (files.length === 0) throw new Error(`Not categories was found in ${from}`);
 
             for (const fileName of files) {
                 /*
@@ -87,8 +87,7 @@ class CategoryManager extends Map<string, ICategory> {
                         'CategoryManager',
                     );
             }
-            this.client.logger.log(`${files.length} categories imported.`, 'CategoryManager');
-            return Promise.resolve();
+            return this.client.logger.log(`${files.length} categories imported.`, 'CategoryManager');
         } catch (error) {
             return Promise.reject(error);
         }

@@ -13,6 +13,11 @@ declare type RequireAtLeastOneOf<T, Keys extends keyof T = keyof T> = Pick<T, Ex
         [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>;
     }[Keys];
 
+// https://stackoverflow.com/questions/39713349/make-all-properties-within-a-typescript-interface-optional/40076355
+declare type DeepPartial<T> = {
+    [P in keyof T]?: T[P] extends object ? Partial<T[P]> : T[P];
+};
+
 declare namespace NodeJS {
     export interface ProcessEnv {
         /** Discord bot token. */

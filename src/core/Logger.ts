@@ -51,7 +51,7 @@ export default class Logger {
 
         const textLog = this.resolveTextLog({ error, level: LoggerLevel.error, serviceName: service });
 
-        console.log(`${red} ${textLog}`, reset);
+        console.log(`${red}${textLog}`, reset);
         this.write(textLog, LoggerLevel.error);
     }
 

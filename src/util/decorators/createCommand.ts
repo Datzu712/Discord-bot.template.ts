@@ -1,12 +1,18 @@
-import { IBaseCommand } from '../../structures/BaseCommand';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { BaseCommand, CommandTypes, IBaseCommand } from '../../structures/BaseCommand';
 import Client from '../../core/Client';
 import Category from '../../structures/BaseCategory';
 
-/** Create a new command command, use second param only for slash commands */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function createCommand(data: IBaseCommand['data']): any {
+/** Create a new command. */
+export default function createCommand(data: DeepPartial<IBaseCommand['data']>): any {
     if (data.category instanceof Category)
         throw new Error(`Don't assign categories manually, only put the name of category.`);
+
+    if (!data.name || !data.category)
+        throw new Error(
+            `Command ${!data.name ? 'name' : 'category'} is required. (data.${!data.name ? 'name' : 'category'})`,
+        );
 
     if (!data.permissions)
         data.permissions = {
@@ -22,15 +28,19 @@ export default function createCommand(data: IBaseCommand['data']): any {
 
     /**
      * Decorator.
-     * @param { Function } Function - Constructor class. BaseCommand (client, data) {}
-     * @returns { Function } Function - New class without second param. BaseCommand (client) {}
+     * @param { Function } commandClass - Constructor class. BaseCommand (client, data)
+     * @returns { Function } Function - New class without second param. BaseCommand (client)
      */
-    return function decorator<K extends IBaseCommand['data']>(
-        commandClass: new (...args: unknown[]) => K,
+    return function decorator<K extends typeof BaseCommand>(
+        constructor: { type: CommandTypes } & (new (
+            client: Client,
+            data: IBaseCommand['data'],
+        ) => K) /* object & { new (...args: any[]): K } */,
     ): new (client: Client) => K {
         // https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Proxy
-        return new Proxy(commandClass, {
-            construct: (ctx, [client]): K => new ctx(client, data),
-        });
+        return new Proxy<typeof constructor>(constructor, {
+            construct: (ctx, [client]): K => new ctx(client, data as IBaseCommand['data']),
+        }) as (new (client: Client) => K) & { type: CommandTypes };
     };
+    // TODO: fix this types...
 }
