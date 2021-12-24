@@ -36,7 +36,6 @@ export default class Util {
             process.env.SENTRY_DSN,
         ];
         for (const word of bannedWords) {
-            console.log(text);
             text = text.replaceAll(word, 'PRIVATE');
         }
         return text;

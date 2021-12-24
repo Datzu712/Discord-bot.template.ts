@@ -2,7 +2,7 @@ import Client from '../core/Client';
 import { ChannelCommand } from '../structures/ChannelCommand';
 import similarly from 'string-similarity';
 import { PathLike, readdirSync } from 'fs-extra';
-import SlashCommand from '../structures/SlashCommand';
+import { SlashCommand } from '../structures/SlashCommand';
 import { CommandInteraction, Message } from 'discord.js';
 import { BaseCommand, CommandTypes } from '../structures/BaseCommand';
 
@@ -139,7 +139,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                 false,
             ) as BaseCommand;
 
-            if (context instanceof Message && !context.content.startsWith(prefix)) return;
+            if (context instanceof Message && !context.content.startsWith(prefix) && !command) return;
             if (!command?.checkPermissions(context)) return;
 
             if (!command.execute)
@@ -151,13 +151,13 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
             // Channel commands need arguments in the second parameter (args)...
             await command
                 .execute(
-                    context,
-                    context instanceof Message ? context.content.slice(prefix.length).split(' ').slice(1) : undefined,
+                    context instanceof Message
+                        ? { prefix, msg: context, args: context.content.slice(prefix.length).split(' ').slice(1) }
+                        : context,
                 )
                 .catch((error: Error) => {
                     this.client.logger.error(error, 'CommandManager');
                 });
-
             const endTime = Date.now();
             this.client.logger.log(
                 `Command ${command.data.name} was executed in ${endTime - startTime}ms by ${

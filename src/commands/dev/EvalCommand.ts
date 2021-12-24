@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/indent */
 import { Message, MessageEmbed } from 'discord.js';
-import { ChannelCommand } from '../../structures/ChannelCommand';
+import { ChannelCommand, ChannelExecuteContext } from '../../structures/ChannelCommand';
 import createCommand from '../../util/decorators/createCommand';
 import util from 'util';
 import beautify from 'js-beautify';
@@ -13,9 +13,10 @@ import beautify from 'js-beautify';
     guildOnly: true,
     aliases: ['e'],
     devOnly: true,
+    permissions: {},
 })
 export default class testCommand extends ChannelCommand {
-    public async execute(msg: Message, args: string[]): Promise<Message> {
+    public async execute({ msg, args }: ChannelExecuteContext): Promise<Message> {
         const startTime = Date.now();
 
         if (!args[0]) return msg.channel.send('Please provide some code to evaluate.');

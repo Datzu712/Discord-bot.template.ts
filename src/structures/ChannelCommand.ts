@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Message, CommandInteraction, GuildMember, TextChannel } from 'discord.js';
 import Client from '../core/Client';
 import { BaseCommand, IBaseCommand, CommandTypes } from './BaseCommand';
 
-export interface ExecuteCommandOptions {
+export interface ChannelExecuteContext {
     args: string[];
-    prefixUsed?: string;
+    prefix: string;
     msg: Message;
 }
 
-export abstract class ChannelCommand extends BaseCommand implements IBaseCommand {
+export class ChannelCommand extends BaseCommand implements IBaseCommand {
     /** Command type. (Disable slash command decorators). */
     static readonly type: CommandTypes = 'CHANNEL_COMMAND';
 
@@ -28,6 +29,8 @@ export abstract class ChannelCommand extends BaseCommand implements IBaseCommand
     public checkPermissions(context: Message): boolean {
         // (Remove this validation if you want) Developers can skip permissions to execute commands with -f at least argument (prefix.command arg1 arg2 -f).
 
+        return true;
+
         if (context instanceof CommandInteraction) throw new Error('Context must be a Message instance.');
 
         if (this.data.disabled === true || (this.data.guildOnly === true && !context.guild)) return false;
@@ -41,5 +44,9 @@ export abstract class ChannelCommand extends BaseCommand implements IBaseCommand
             }
         }
         return true;
+    }
+
+    public execute(executeOptions: ChannelExecuteContext): Promise<Message | void> {
+        throw new Error('Method not implemented.');
     }
 }

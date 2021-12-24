@@ -1,4 +1,4 @@
-import BaseSlashCommand from './SlashCommand';
+import { SlashCommand } from './SlashCommand';
 import { BaseCommand } from './BaseCommand';
 
 // TODO adjust Sub categories
@@ -7,7 +7,7 @@ export interface ICategory {
     name: [string, string];
 
     /** Category Commands. */
-    commands?: Map<string, BaseCommand | BaseSlashCommand>;
+    commands?: Map<string, BaseCommand | SlashCommand>;
 
     /** Category description. */
     description: string;
@@ -25,7 +25,7 @@ export default class Category implements ICategory {
     public name: [string, string];
 
     /** Category Commands. */
-    public commands?: Map<string, BaseCommand | BaseSlashCommand>;
+    public commands?: Map<string, BaseCommand | SlashCommand>;
 
     /** Category description. */
     public description: string;

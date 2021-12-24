@@ -23,18 +23,18 @@ export interface IBaseCommand {
         /** Command status. True for disabled (globally) the command. */
         disabled?: boolean;
 
-        permissions?: {
+        permissions: {
             /** Member permissions. (Text channel) */
-            member?: PermissionString[];
+            member: PermissionString[];
 
             /** Bot permissions. */
-            me?: PermissionString[];
+            me: PermissionString[];
 
             /** Require member voice connection. */
-            requireVoiceConnection?: boolean;
+            requireVoiceConnection: boolean;
 
             /** Custom command permissions */
-            experimentalCustomPermissions?: boolean;
+            experimentalCustomPermissions: boolean;
         };
         /** If the command is only for developers. */
         devOnly?: boolean;
@@ -63,7 +63,7 @@ export interface IBaseCommand {
 
 export abstract class BaseCommand implements IBaseCommand {
     /** Command type. (Disable slash command decorator). */
-    static readonly type: CommandTypes;
+    public static readonly type: CommandTypes;
 
     /**
      * Construct new command.

@@ -4,22 +4,21 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import Client from '../core/Client';
 import { CommandInteraction, Message } from 'discord.js';
 
-export interface IBaseSlashCommand extends IBaseCommand {
-    builder: SlashCommandBuilder;
+export interface ISlashCommand extends IBaseCommand {
+    data: IBaseCommand['data'];
     execute(interaction: CommandInteraction): Promise<void>;
 }
 
-export default abstract class SlashCommand extends BaseCommand implements IBaseSlashCommand {
+export abstract class SlashCommand extends BaseCommand implements ISlashCommand {
     /** Command type. (Enable slash command decorators)  */
     static readonly type: CommandTypes = 'SLASH_COMMAND';
     public data: IBaseCommand['data'];
-    public builder: SlashCommandBuilder;
+    builder?: SlashCommandBuilder;
 
-    public constructor(public readonly client: Client, data: IBaseCommand['data'], builder: SlashCommandBuilder) {
+    public constructor(public readonly client: Client, data: IBaseCommand['data']) {
         super(client, data);
 
         this.data = data;
-        this.builder = builder;
     }
 
     public async execute(interaction: CommandInteraction) {
