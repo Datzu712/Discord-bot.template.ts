@@ -106,7 +106,7 @@ class CategoryManager extends Map<string, ICategory> {
             const category = this.get(command.data.category as string);
             if (!category) {
                 this.client.logger.warn(
-                    `Could not find the category ${command.data.category} of ${name}`,
+                    `Could not find the category ${command.data.category} of command ${name}`,
                     'CategoryManager',
                 );
                 continue;

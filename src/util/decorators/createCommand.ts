@@ -18,7 +18,7 @@ export default function createCommand(data: DeepPartial<IBaseCommand['data']>): 
         data.permissions = {
             member: [],
             me: [],
-            requireVoiceConnection: false,
+            requireMemberVoiceConnection: false,
             experimentalCustomPermissions: false,
         };
 

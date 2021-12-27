@@ -20,7 +20,7 @@ export interface IBaseCommand {
         /** Command cooldown .*/
         cooldown?: number | null;
 
-        /** Command status. True for disabled (globally) the command. */
+        /** Command state. True for disabled (globally) the command. */
         disabled?: boolean;
 
         permissions: {
@@ -31,9 +31,9 @@ export interface IBaseCommand {
             me: PermissionString[];
 
             /** Require member voice connection. */
-            requireVoiceConnection: boolean;
+            requireMemberVoiceConnection: boolean;
 
-            /** Custom command permissions */
+            /** Custom command permissions for guilds. */
             experimentalCustomPermissions: boolean;
         };
         /** If the command is only for developers. */
@@ -58,7 +58,6 @@ export interface IBaseCommand {
         category: string | Category;
     };
     execute(...args: unknown[]): Promise<unknown>;
-    checkPermissions(...args: unknown[]): boolean;
 }
 
 export abstract class BaseCommand implements IBaseCommand {
@@ -78,6 +77,4 @@ export abstract class BaseCommand implements IBaseCommand {
      * @returns
      */
     abstract execute(...args: unknown[]): Promise<unknown>;
-
-    abstract checkPermissions(...args: unknown[]): boolean;
 }

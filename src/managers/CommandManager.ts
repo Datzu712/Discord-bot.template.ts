@@ -139,8 +139,8 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                 false,
             ) as BaseCommand;
 
-            if (context instanceof Message && !context.content.startsWith(prefix) && !command) return;
-            if (!command?.checkPermissions(context)) return;
+            if ((context instanceof Message && !context.content.startsWith(prefix)) || !command) return;
+            //if (!command?.checkPermissions(context)) return;
 
             if (!command.execute)
                 return this.client.logger.warn(
@@ -158,9 +158,8 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                 .catch((error: Error) => {
                     this.client.logger.error(error, 'CommandManager');
                 });
-            const endTime = Date.now();
             this.client.logger.log(
-                `Command ${command.data.name} was executed in ${endTime - startTime}ms by ${
+                `Command ${command.data.name} was executed in ${Date.now() - startTime}ms by ${
                     (context as CommandInteraction).user?.tag ?? (context as Message).author.tag
                 }. `,
                 'CommandManager',
