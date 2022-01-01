@@ -1,4 +1,4 @@
-import { GuildMember, Message } from 'discord.js';
+import { GuildMember, Message, TextChannel } from 'discord.js';
 import Client from '../core/Client';
 import { BaseCommand, IBaseCommand, CommandTypes } from './BaseCommand';
 
@@ -46,19 +46,36 @@ export class ChannelCommand extends BaseCommand implements IBaseCommand {
             if (!msg.member?.voice?.channel) {
                 return { continue: false, error: 'You must be in a voice channel to use this command!' };
             }
-            const myVoiceChannelPermissions = msg.member?.voice?.channel?.permissionsFor(msg.guild?.me as GuildMember);
-            if (!myVoiceChannelPermissions.has('SPEAK') || !myVoiceChannelPermissions.has('CONNECT')) {
+            // Bot voice channel permissions.
+            const voiceChannelPermissions = msg.member?.voice?.channel?.permissionsFor(msg.guild?.me as GuildMember);
+            if (!voiceChannelPermissions.has('SPEAK') || !voiceChannelPermissions.has('CONNECT')) {
                 return {
                     continue: false,
                     error: `I need the permission ${
-                        !myVoiceChannelPermissions.has('SPEAK') ? 'connect' : 'speak'
+                        !voiceChannelPermissions.has('SPEAK') ? '`connect`' : 'speak'
                     } in <#${msg.member?.voice?.channel.id}>`,
                 };
             }
         }
 
-        for (const context in { me: { ...this.data.permissions.me }, member: { ...this.data.permissions.member } }) {
+        // Check bot and member permissions.
+        for (const context in { me: [...this.data.permissions.me], member: [...this.data.permissions.member] }) {
             const permissions = this.data.permissions[context as 'me' | 'member'];
+
+            for (const permission of permissions) {
+                const memberPermissions =
+                    context == 'me'
+                        ? (msg.channel as TextChannel).permissionsFor(msg?.guild?.me as GuildMember)
+                        : (msg.channel as TextChannel).permissionsFor(msg?.member as GuildMember);
+                if (!memberPermissions?.has(permission)) {
+                    return {
+                        continue: false,
+                        error: `${
+                            context == 'me' ? 'I' : 'You'
+                        } need the permission ${permission} to use this command!`,
+                    };
+                }
+            }
         }
 
         return { continue: true };

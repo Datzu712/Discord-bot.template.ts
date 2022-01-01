@@ -1,5 +1,15 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+/* eslint-disable @typescript-eslint/indent */
+
+import { SlashCommandBuilder, SlashCommandSubcommandGroupBuilder } from '@discordjs/builders';
 import { CommandTypes } from '../../structures/BaseCommand';
+
+export function addSubcommandGroup(
+    input:
+        | SlashCommandSubcommandGroupBuilder
+        | ((subcommandGroup: SlashCommandSubcommandGroupBuilder) => SlashCommandSubcommandGroupBuilder),
+) {
+    input;
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default function slashBuilder(builder: SlashCommandBuilder) {
