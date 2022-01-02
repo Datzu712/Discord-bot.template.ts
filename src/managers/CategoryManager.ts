@@ -5,7 +5,7 @@ import Client from '../core/Client';
 
 const unknownCategory = new Category({
     name: ['unknown', '📕'],
-    description: 'Commands with unknown category.',
+    description: 'Unknown commands.',
     hidden: true,
 });
 
@@ -56,15 +56,25 @@ class CategoryManager extends Map<string, ICategory> {
                 */
                 const Category: {
                     default: Category;
-                } = await import(`${from}/${fileName}`).catch((error) =>
-                    this.client.logger.error(new Error(`Failed to import category ${fileName}` + error)),
+                } = await import(`${from}/${fileName}`).catch((error: Error) =>
+                    this.client.logger.error(
+                        new Error(`Failed to import category ${fileName}: ` + error.message),
+                        'CategoryManager',
+                    ),
                 );
 
-                if (!Category?.default) continue;
+                if (!Category?.default) {
+                    this.client.logger.warn(
+                        `Category ${fileName} has not been exported by default.`,
+                        'CategoryManager',
+                    );
+                    continue;
+                }
 
                 // Add category to this map.
                 const category = Category.default;
                 this.set(category.name[0], category);
+
                 if (this.debug) this.client.logger.debug(`Category ${category.name[0]} imported.`, 'CategoryManager');
             }
 
@@ -89,7 +99,7 @@ class CategoryManager extends Map<string, ICategory> {
             }
             return this.client.logger.log(`${files.length} categories imported.`, 'CategoryManager');
         } catch (error) {
-            return Promise.reject(error);
+            this.client.logger.error(error as Error, 'CategoryManager');
         }
     }
     /**

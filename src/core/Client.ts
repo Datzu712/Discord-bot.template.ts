@@ -48,9 +48,10 @@ class Client extends djs.Client {
                 this.events.importEvents(resolve(`${__dirname}/../events`)),
             ])
                 .then(() => this.categories.syncCommands())
+                // It's difficult that the promise be rejected.
                 .catch((err) => this.logger.error(err, 'client'));
         } catch (error) {
-            return Promise.reject(error);
+            this.logger.error(error as Error, 'Client');
         }
         return this;
     }

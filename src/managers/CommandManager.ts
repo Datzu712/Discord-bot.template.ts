@@ -69,11 +69,12 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                         If some error occurs (.catch) CommandClass is converted in undefined and we handle the error and continue registering commands.
                     */
                     const Command: {
-                        // ChannelCommand {
-                        //     default: [BaseCommand],
-                        //     type: CommandTypes
-                        // };
-                        //}
+                        /* 
+                            ChannelCommand {
+                                default: [BaseCommand],
+                                type: CommandTypes
+                            };
+                        */
                         default: { type: CommandTypes } & (new (client: Client) => ChannelCommand | SlashCommand);
                     } = await import(`${from}/${folderName}/${cmdFileName}`).catch((error) =>
                         this.client.logger.error(
@@ -118,7 +119,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                 this.client.logger.info(`Command ${this.size} imported.`, 'CommandManager');
             }
         } catch (error) {
-            return Promise.reject(error);
+            this.client.logger.error(error as Error, 'CommandManager');
         }
     }
 
@@ -165,7 +166,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                 'CommandManager',
             );
         } catch (error) {
-            this.client.logger.error(error instanceof Error ? error : new Error(error as string), 'CommandManager');
+            this.client.logger.error(error as Error, 'CommandManager');
         }
     }
 }
