@@ -8,7 +8,14 @@ export function addSubcommandGroup(
         | SlashCommandSubcommandGroupBuilder
         | ((subcommandGroup: SlashCommandSubcommandGroupBuilder) => SlashCommandSubcommandGroupBuilder),
 ) {
-    input;
+    return function decorate<T extends new (...args: unknown[]) => object>(
+        constructor: T & { builder: SlashCommandBuilder },
+    ) {
+        if (!constructor.prototype.builder) {
+            constructor.prototype.builder = new SlashCommandBuilder();
+            constructor.builder.addSubcommandGroup(input);
+        }
+    };
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
