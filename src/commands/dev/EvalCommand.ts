@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/indent */
 import { Message, MessageEmbed } from 'discord.js';
 import { ChannelCommand, ChannelExecuteContext } from '../../structures/ChannelCommand';
-import createCommand from '../../util/decorators/createCommand';
+import { createCommand } from '../../util/decorators/createCommand';
 import util from 'util';
 import beautify from 'js-beautify';
 

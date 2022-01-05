@@ -1,24 +1,24 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/indent */
-import { SlashCommandBuilder, SlashCommandSubcommandGroupBuilder } from '@discordjs/builders';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandTypes } from '../../structures/BaseCommand';
 
-export function addSubcommandGroup(
-    input:
-        | SlashCommandSubcommandGroupBuilder
-        | ((subcommandGroup: SlashCommandSubcommandGroupBuilder) => SlashCommandSubcommandGroupBuilder),
-) {
-    return function decorate<T extends new (...args: unknown[]) => object>(
-        constructor: T & { builder: SlashCommandBuilder },
+export function test(input: (arg: SlashCommandBuilder) => SlashCommandBuilder) {
+    return function decorate<T extends new (...args: any[]) => object>(
+        constructor: T & { builder?: SlashCommandBuilder },
     ) {
-        if (!constructor.prototype.builder) {
+        if (!constructor.builder) {
             constructor.prototype.builder = new SlashCommandBuilder();
-            constructor.builder.addSubcommandGroup(input);
         }
+
+        return class extends constructor {
+            builder = input(constructor.prototype.builder);
+        };
     };
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export default function slashBuilder(builder: SlashCommandBuilder) {
+export function slashBuilder(builder: SlashCommandBuilder) {
     return function decorate<T extends { type: CommandTypes } & (new (...args: any[]) => object)>(constructor: T) {
         if (constructor.type === 'CHANNEL_COMMAND')
             throw new Error('@slashBuilder can only be used on a SlashCommand instance.');
