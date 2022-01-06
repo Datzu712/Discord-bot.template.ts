@@ -41,7 +41,10 @@ export function createCommand(data: DeepPartial<IBaseCommand['data']>): any {
     };
 }
 
-/**  */
+/**
+ * Command execute decorator.
+ * @description Before execute the command, this decorator will create another function that evaluates if the author of the message is a developer and then executes it if it is.
+ */
 export function OnlyForDevelopers() {
     return Mediator(async (context: ExecuteCommandOptions | CommandInteraction) => {
         if (context instanceof CommandInteraction) {

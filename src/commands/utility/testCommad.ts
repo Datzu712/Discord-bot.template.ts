@@ -1,7 +1,5 @@
-import { ChannelCommand } from '../../structures/ChannelCommand';
-import { createCommand, OnlyForDevelopers } from '../../util/decorators/createCommand';
-import { Message } from '../../util/decorators/commandParams';
-import { Message as djsMsg } from 'discord.js';
+import { ChannelCommand, ChannelExecuteContext as context } from '../../structures/ChannelCommand';
+import { createCommand } from '../../util/decorators/createCommand';
 
 @createCommand({
     name: 'test',
@@ -12,11 +10,8 @@ import { Message as djsMsg } from 'discord.js';
     aliases: ['test'],
 })
 export default class testCommand extends ChannelCommand {
-    // @OnlyForDevelopers()
-    public async execute(@Message() msg: djsMsg): Promise<void> {
+    public async execute({ msg }: context): Promise<void> {
         console.log('msg');
         msg;
     }
-
-    //test = () => 'test';
 }
