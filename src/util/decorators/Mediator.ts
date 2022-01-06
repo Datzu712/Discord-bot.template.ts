@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function Mediator(fn: (...args: any[]) => Promise<boolean>): any {
     // TODO: fix this types.
-    return (target: any, _: never, propertyDescriptor: PropertyDescriptor) => {
+    return (target: new (...args: unknown[]) => unknown, _: never, propertyDescriptor: PropertyDescriptor) => {
         const oldFn = propertyDescriptor.value;
         if (!oldFn) throw new Error('Invalid target type.');
 
