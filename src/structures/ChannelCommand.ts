@@ -2,6 +2,7 @@ import { GuildMember, Message, TextChannel } from 'discord.js';
 import Client from '../core/Client';
 import { BaseCommand, IBaseCommand, CommandTypes } from './BaseCommand';
 
+// TODO Search better name for this interface D:.
 export interface ChannelExecuteContext {
     args: string[];
     prefix: string;
@@ -26,7 +27,7 @@ export class ChannelCommand extends BaseCommand implements IBaseCommand {
     }*/
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public execute(executeOptions: any): Promise<Message | void> {
+    public execute(executeOptions: ChannelExecuteContext): Promise<Message | void> {
         throw new Error('Method not implemented.');
     }
 
@@ -77,7 +78,6 @@ export class ChannelCommand extends BaseCommand implements IBaseCommand {
                 }
             }
         }
-
         return { continue: true };
     }
 }

@@ -11,7 +11,6 @@ import { createCommand } from '../../util/decorators/createCommand';
 })
 export default class testCommand extends ChannelCommand {
     public async execute({ msg }: context): Promise<void> {
-        console.log('msg');
         msg;
     }
 }

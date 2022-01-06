@@ -19,6 +19,7 @@ import beautify from 'js-beautify';
 export default class EvalCommand extends ChannelCommand {
     @OnlyForDevelopers()
     public async execute({ msg, args }: ChannelExecuteContext): Promise<Message> {
+        console.log(this.client);
         const startTime = Date.now();
 
         if (!args[0]) return msg.channel.send('Please provide some code to evaluate.');

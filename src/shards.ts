@@ -24,7 +24,7 @@ shardManager
 
         shard
             .on('disconnect', () => logger.warn(`Shard ${shard.id} disconnected`, 'ShardManager'))
-            .on('reconnecting', () => logger.warn(`Shard ${shard.id} reconnecting`, 'ShardManager'))
+            .on('reconnection', () => logger.warn(`Shard ${shard.id} reconnecting`, 'ShardManager'))
             .on('error', (error) => logger.error(error, 'ShardManager'));
     })
     .spawn({ amount: totalShards })

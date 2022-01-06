@@ -5,10 +5,10 @@ export function Mediator(fn: (...args: any[]) => Promise<boolean>): any {
         const oldFn = propertyDescriptor.value;
         if (!oldFn) throw new Error('Invalid target type.');
 
-        propertyDescriptor.value = async (ctx: unknown) => {
+        propertyDescriptor.value = async function Mediator(ctx: unknown) {
             const res = await fn(ctx).catch(() => false);
 
-            if (res === true) return oldFn.apply(target, [ctx]);
+            if (res === true) return oldFn.apply(this, [ctx]);
         };
 
         return propertyDescriptor;

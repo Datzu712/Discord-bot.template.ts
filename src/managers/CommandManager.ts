@@ -103,7 +103,6 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                         Slash commands is added with the key '/' like ["/slashCommandName", [SlashCommand]] 
                         Some commands are declared like slash and channel command with the same name.
                     */
-                    console.log(command.data.name, command.execute);
                     this.set(
                         Command.default.type === 'SLASH_COMMAND' ? `/${command.data.name}` : command.data.name,
                         command,
@@ -145,8 +144,8 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
             //if (!command?.checkPermissions(context)) return;
 
             if (!command.execute)
-                return this.client.logger.warn(
-                    `Command ${command.data.name} has not execute function.`,
+                return this.client.logger.error(
+                    new Error(`Command ${command.data.name} has not execute function.`),
                     'CommandManager',
                 );
 
