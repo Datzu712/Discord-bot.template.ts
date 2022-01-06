@@ -26,7 +26,7 @@ export class ChannelCommand extends BaseCommand implements IBaseCommand {
     }*/
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public execute(executeOptions: ChannelExecuteContext): Promise<Message | void> {
+    public execute(executeOptions: any): Promise<Message | void> {
         throw new Error('Method not implemented.');
     }
 

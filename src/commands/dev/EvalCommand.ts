@@ -16,7 +16,7 @@ import beautify from 'js-beautify';
     devOnly: true,
     permissions: {},
 })
-export default class testCommand extends ChannelCommand {
+export default class EvalCommand extends ChannelCommand {
     public async execute({ msg, args }: ChannelExecuteContext): Promise<Message> {
         const startTime = Date.now();
 

@@ -41,6 +41,7 @@ export function createCommand(data: DeepPartial<IBaseCommand['data']>): any {
     };
 }
 
+/**  */
 export function OnlyForDevelopers() {
     return Mediator(async (context: ExecuteCommandOptions | CommandInteraction) => {
         if (context instanceof CommandInteraction) {

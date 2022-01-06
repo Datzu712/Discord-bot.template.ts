@@ -4,7 +4,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandTypes } from '../../structures/BaseCommand';
 
 export function test(input: (arg: SlashCommandBuilder) => SlashCommandBuilder) {
-    return function decorate<T extends new (...args: any[]) => object>(
+    return function decorate<T extends new (...args: any[]) => { builder?: SlashCommandBuilder }>(
         constructor: T & { builder?: SlashCommandBuilder },
     ) {
         if (!constructor.builder) {
