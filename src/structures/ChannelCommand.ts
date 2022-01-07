@@ -65,9 +65,9 @@ export class ChannelCommand extends BaseCommand implements IBaseCommand {
                 };
             }
         }
-
         // Check bot and member permissions in the guild.
         if (message.guild) {
+            // The idea of this for is don't repeat the same code evaluating the bot and member permissions.
             for (const context in { member: [...this.data.permissions.member], me: [...this.data.permissions.me] }) {
                 const permissions = this.data.permissions[context as 'me' | 'member'];
 
