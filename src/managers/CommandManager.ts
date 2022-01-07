@@ -127,7 +127,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
      * Handle channel and interaction commands.
      * @param { object } context - Message or CommandInteraction.
      * @param { string } prefix - The prefix what was used with the command.
-     * @returns { Promise<void> } Command execution...
+     * @returns { Promise } Command execution...
      */
     public async handle(context: Message | CommandInteraction, prefix: string): Promise<void> {
         const startTime = Date.now();
@@ -141,7 +141,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
             ) as BaseCommand;
 
             if ((context instanceof Message && !context.content.startsWith(prefix)) || !command) return;
-            //if (!command?.checkPermissions(context)) return;
+            //if (!command.checkPermissions(context)) return;
 
             if (!command.execute)
                 return this.client.logger.error(

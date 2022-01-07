@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Message, PermissionString, CommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import { Message, PermissionString } from 'discord.js';
 import { PathLike } from 'fs-extra';
 import Client from '../core/Client';
 import Category from './BaseCategory';
@@ -36,7 +36,7 @@ export interface IBaseCommand {
             /** Custom command permissions for guilds. */
             experimentalCustomPermissions: boolean;
         };
-        /** If the command is only for developers. */
+        /** If the command is only for developers. Better use `OnlyForDevelopers` decorator.*/
         devOnly?: boolean;
 
         /** The Command can only execute in server. */

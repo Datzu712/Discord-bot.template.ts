@@ -10,7 +10,6 @@ export function Mediator(fn: (...args: any[]) => Promise<boolean>): any {
 
             if (res === true) return oldFn.apply(this, [ctx]);
         };
-
         return propertyDescriptor;
     };
 }

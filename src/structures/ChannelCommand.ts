@@ -31,50 +31,59 @@ export class ChannelCommand extends BaseCommand implements IBaseCommand {
         throw new Error('Method not implemented.');
     }
 
-    public checkPermissions(msg: Message): { continue: boolean; error?: string } {
+    /**
+     * Check permissions before executing the command.
+     * @param { Message } msg - Message object.
+     * @returns { object } If the command can be executed.
+     */
+    public checkPermissionsFor(message: Message): { continue: boolean; error?: string } {
         // Check if the command is only for developers.
-        if (this.data.devOnly && !this.client.team.includes(msg.author.id)) {
-            return { continue: false, error: `Only developers can use this command!` };
+        if (this.data.devOnly && !this.client.team.includes(message.author.id)) {
+            return { continue: false, error: 'This command is only for developers.' };
         }
 
-        // Check if the command is can only be used in a guild.
-        if (this.data.guildOnly && !msg.guild) {
+        // Check if the command can be only used in a guild.
+        if (this.data.guildOnly && !message.guild) {
             return { continue: false, error: 'You must be in a server to use this command!' };
         }
 
         // Check if the command require member voice connection.
         if (this.data.permissions.requireMemberVoiceConnection) {
-            if (!msg.member?.voice?.channel) {
+            if (!message.member?.voice?.channel) {
                 return { continue: false, error: 'You must be in a voice channel to use this command!' };
             }
             // Bot voice channel permissions.
-            const voiceChannelPermissions = msg.member?.voice?.channel?.permissionsFor(msg.guild?.me as GuildMember);
+            const voiceChannelPermissions = message.member?.voice?.channel?.permissionsFor(
+                message.guild?.me as GuildMember,
+            );
             if (!voiceChannelPermissions.has('SPEAK') || !voiceChannelPermissions.has('CONNECT')) {
                 return {
                     continue: false,
                     error: `I need the permission ${
                         !voiceChannelPermissions.has('SPEAK') ? '`connect`' : 'speak'
-                    } in <#${msg.member?.voice?.channel.id}>`,
+                    } in <#${message.member?.voice?.channel.id}>`,
                 };
             }
         }
 
-        // Check bot and member permissions.
-        for (const context in { me: [...this.data.permissions.me], member: [...this.data.permissions.member] }) {
-            const permissions = this.data.permissions[context as 'me' | 'member'];
+        // Check bot and member permissions in the guild.
+        if (message.guild) {
+            for (const context in { member: [...this.data.permissions.member], me: [...this.data.permissions.me] }) {
+                const permissions = this.data.permissions[context as 'me' | 'member'];
 
-            for (const permission of permissions) {
-                const memberPermissions =
-                    context == 'me'
-                        ? (msg.channel as TextChannel).permissionsFor(msg?.guild?.me as GuildMember)
-                        : (msg.channel as TextChannel).permissionsFor(msg?.member as GuildMember);
-                if (!memberPermissions?.has(permission)) {
-                    return {
-                        continue: false,
-                        error: `${
-                            context == 'me' ? 'I' : 'You'
-                        } need the permission ${permission} to use this command!`,
-                    };
+                for (const permission of permissions) {
+                    const memberPermissions =
+                        context == 'me'
+                            ? (message.channel as TextChannel).permissionsFor(message?.guild?.me as GuildMember)
+                            : (message.channel as TextChannel).permissionsFor(message?.member as GuildMember);
+                    if (!memberPermissions?.has(permission)) {
+                        return {
+                            continue: false,
+                            error: `${
+                                context == 'me' ? 'I' : 'You'
+                            } need the permission ${permission} to use this command!`,
+                        };
+                    }
                 }
             }
         }
