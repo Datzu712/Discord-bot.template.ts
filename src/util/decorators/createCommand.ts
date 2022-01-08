@@ -4,7 +4,7 @@ import { BaseCommand, CommandTypes, IBaseCommand, ExecuteCommandOptions } from '
 import Client from '../../core/Client';
 import Category from '../../structures/BaseCategory';
 import { Mediator } from './Mediator';
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, GuildMember } from 'discord.js';
 
 /** Create a new command decorator. */
 export function createCommand(data: DeepPartial<IBaseCommand['data']>): any {
@@ -19,7 +19,7 @@ export function createCommand(data: DeepPartial<IBaseCommand['data']>): any {
     data.permissions = {
         member: data?.permissions?.member ?? [],
         me: data?.permissions?.me ?? [],
-        requireMemberVoiceConnection: data?.permissions?.requireMemberVoiceConnection ?? false,
+        //requireMemberVoiceConnection: data?.permissions?.requireMemberVoiceConnection ?? false,
         experimentalCustomPermissions: data?.permissions?.experimentalCustomPermissions ?? false,
     };
 
@@ -46,12 +46,49 @@ export function createCommand(data: DeepPartial<IBaseCommand['data']>): any {
  * @description Before execute the command, this decorator will create another function that evaluates if the author of the message is a developer and then executes it if it is.
  */
 export function OnlyForDevelopers() {
-    return Mediator(async (context: ExecuteCommandOptions | CommandInteraction) => {
-        if (context instanceof CommandInteraction) {
-            if ((context as CommandInteraction).user.id === '444295883182309378') return true;
+    return Mediator(async (context: ExecuteCommandOptions | CommandInteraction, next: LikeFunction<void>) => {
+        if (
+            (context as CommandInteraction).user.id === '444295883182309378' ||
+            (context as ExecuteCommandOptions).msg.author.id === '444295883182309378'
+        ) {
+            next();
         }
-        if ((context as ExecuteCommandOptions).msg.author.id === '444295883182309378') return true;
+    });
+}
 
-        return false;
+/**
+ * Command execute decorator.
+ * @description Before execute the command, this decorator will create another function that evaluates if the author of the message is in a voice channel.
+ */
+export function RequireMemberVoiceConnection() {
+    return Mediator(async (context: ExecuteCommandOptions | CommandInteraction, next: LikeFunction<void>) => {
+        const voiceChannel =
+            ((context as CommandInteraction)?.member as GuildMember)?.voice.channel ||
+            ((context as ExecuteCommandOptions).msg.member as GuildMember)?.voice.channel;
+
+        if (!voiceChannel) {
+            next;
+        }
+        /*
+        
+            if (!message.member?.voice?.channel) {
+                return { continue: false, error: 'You must be in a voice channel to use this command!' };
+            }
+            // Bot voice channel permissions.
+            const voiceChannelPermissions = message.member?.voice?.channel?.permissionsFor(
+                message.guild?.me as GuildMember,
+            );
+            if (!voiceChannelPermissions.has('SPEAK') || !voiceChannelPermissions.has('CONNECT')) {
+                return {
+                    continue: false,
+                    error: `I need the permission ${
+                        !voiceChannelPermissions.has('SPEAK') ? '`connect`' : 'speak'
+                    } in <#${message.member?.voice?.channel.id}>`,
+                };
+            }
+
+        */
+
+        // return false;
     });
 }

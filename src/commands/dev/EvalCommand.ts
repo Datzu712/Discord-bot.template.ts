@@ -13,7 +13,6 @@ import beautify from 'js-beautify';
     usage: 'eval [code]',
     guildOnly: true,
     aliases: ['e'],
-    devOnly: true,
     permissions: {},
 })
 export default class EvalCommand extends ChannelCommand {

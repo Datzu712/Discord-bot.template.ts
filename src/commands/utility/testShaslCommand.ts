@@ -1,7 +1,7 @@
 import { createCommand } from '../../util/decorators/createCommand';
 import { test } from '../../util/decorators/slashBuilder';
 import { SlashCommand } from '../../structures/SlashCommand';
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, GuildMember } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 
 @createCommand({
@@ -16,16 +16,17 @@ import { SlashCommandBuilder } from '@discordjs/builders';
     (input) =>
         input
             .addUserOption((options) =>
-                options.setRequired(true).setName('usuario').setDescription('Mentioner a un usuario.'),
+                options.setRequired(true).setName('test').setDescription('testfaefaeffeaf a erffa'),
             )
-            .setName('addcoins')
-            .setDescription('Agrega SHD coins a un usuario.')
+            .setName('test')
+            .setDescription(' fdkaekjfjk aejnmfnajmjanfwjnwfe.')
             .addIntegerOption((options) =>
-                options.setName('coins').setDescription('El numero de SHD coins que va a agregar.').setRequired(true),
+                options.setName('test').setDescription('test.').setRequired(true),
             ) as SlashCommandBuilder,
 )
 export default class testCommand extends SlashCommand {
     public async execute(interaction: CommandInteraction): Promise<void> {
+        (interaction.member as GuildMember).voice.channel;
         return interaction.reply('test');
     }
 }
