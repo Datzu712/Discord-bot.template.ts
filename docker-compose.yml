@@ -12,6 +12,7 @@ services:
     volumes:
       - ./src/:/bot/src/
       - ./.env:/bot/.env
+      - ./logs/:/bot/logs/
     links:
       - botdb
       #- /api/node_modules

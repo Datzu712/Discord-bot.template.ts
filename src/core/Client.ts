@@ -15,7 +15,10 @@ class Client extends djs.Client {
     public readonly logger: Logger;
     // public webhook: djs.WebhookClient;
     private readonly events: EventManager;
-    public utils: Util;
+    public readonly utils: Util;
+
+    // provisional
+    public readonly team = ['444295883182309378'];
 
     constructor(options: djs.ClientOptions) {
         super(options);
@@ -45,9 +48,10 @@ class Client extends djs.Client {
                 this.events.importEvents(resolve(`${__dirname}/../events`)),
             ])
                 .then(() => this.categories.syncCommands())
+                // It's difficult that the promise be rejected.
                 .catch((err) => this.logger.error(err, 'client'));
         } catch (error) {
-            return Promise.reject(error);
+            this.logger.error(error as Error, 'Client');
         }
         return this;
     }

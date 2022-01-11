@@ -29,7 +29,7 @@ class EventManager {
              * ['ready.ts', 'messageCreate.ts', 'customEvent.ts'];
              */
             const files: string[] = readdirSync(from);
-            if (files.length === 0) return Promise.reject(new Error('Could not find events files.'));
+            if (files.length === 0) throw new Error(`Could not find events files in ${from}.`);
 
             for (const fileName of files) {
                 /*
@@ -57,7 +57,7 @@ class EventManager {
             }
             return this.client.logger.info(`Imported ${files.length} events.`, 'EventManager');
         } catch (error) {
-            return Promise.reject(error);
+            this.client.logger.error(error as Error, 'EventManager');
         }
     }
 }

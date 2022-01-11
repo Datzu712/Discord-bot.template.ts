@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Message, CommandInteraction, GuildMember, TextChannel } from 'discord.js';
+import { GuildMember, Message, TextChannel } from 'discord.js';
 import Client from '../core/Client';
 import { BaseCommand, IBaseCommand, CommandTypes } from './BaseCommand';
 
+// TODO Search better name for this interface D:.
 export interface ChannelExecuteContext {
     args: string[];
     prefix: string;
@@ -26,27 +26,62 @@ export class ChannelCommand extends BaseCommand implements IBaseCommand {
         throw new Error('Method not implemented.');
     }*/
 
-    public checkPermissions(context: Message): boolean {
-        // (Remove this validation if you want) Developers can skip permissions to execute commands with -f at least argument (prefix.command arg1 arg2 -f).
-
-        return true;
-
-        if (context instanceof CommandInteraction) throw new Error('Context must be a Message instance.');
-
-        if (this.data.disabled === true || (this.data.guildOnly === true && !context.guild)) return false;
-
-        if (this.data.permissions?.requireVoiceConnection === true && !context.member?.voice.channel) return false;
-
-        if (this.data.permissions?.me?.length !== 0) {
-            for (const permission of this.data.permissions.me as []) {
-                if (!(context.channel as TextChannel).permissionsFor(context?.guild?.me as GuildMember).has(permission))
-                    return false;
-            }
-        }
-        return true;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    public execute(_: ChannelExecuteContext): Promise<Message | void> {
+        throw new Error(`Method not implemented in ${this.data.name} (${__filename}).`);
     }
 
-    public execute(executeOptions: ChannelExecuteContext): Promise<Message | void> {
-        throw new Error('Method not implemented.');
+    /**
+     * Check permissions before executing the command.
+     * @param { Message } msg - Message object.
+     * @returns { object } If the command can be executed.
+     */
+    public checkPermissionsFor(message: Message): { continue: boolean; error?: string } {
+        // Check if the command can be only used in a guild.
+        if (this.data.guildOnly && !message.guild) {
+            return { continue: false, error: 'You must be in a server to use this command!' };
+        }
+
+        // Check if the command require member voice connection.
+        /*if (this.data.permissions.requireMemberVoiceConnection) {
+            if (!message.member?.voice?.channel) {
+                return { continue: false, error: 'You must be in a voice channel to use this command!' };
+            }
+            // Bot voice channel permissions.
+            const voiceChannelPermissions = message.member?.voice?.channel?.permissionsFor(
+                message.guild?.me as GuildMember,
+            );
+            if (!voiceChannelPermissions.has('SPEAK') || !voiceChannelPermissions.has('CONNECT')) {
+                return {
+                    continue: false,
+                    error: `I need the permission ${
+                        !voiceChannelPermissions.has('SPEAK') ? '`connect`' : 'speak'
+                    } in <#${message.member?.voice?.channel.id}>`,
+                };
+            }
+        }*/
+        // Check bot and member permissions in the guild.
+        if (message.guild) {
+            // The idea of this for is don't repeat the same code evaluating the bot and member permissions.
+            for (const context in { member: [...this.data.permissions.member], me: [...this.data.permissions.me] }) {
+                const permissions = this.data.permissions[context as 'me' | 'member'];
+
+                for (const permission of permissions) {
+                    const memberPermissions =
+                        context == 'me'
+                            ? (message.channel as TextChannel).permissionsFor(message?.guild?.me as GuildMember)
+                            : (message.channel as TextChannel).permissionsFor(message?.member as GuildMember);
+                    if (!memberPermissions?.has(permission)) {
+                        return {
+                            continue: false,
+                            error: `${
+                                context == 'me' ? 'I' : 'You'
+                            } need the permission ${permission} to use this command!`,
+                        };
+                    }
+                }
+            }
+        }
+        return { continue: true };
     }
 }

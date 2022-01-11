@@ -69,11 +69,12 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                         If some error occurs (.catch) CommandClass is converted in undefined and we handle the error and continue registering commands.
                     */
                     const Command: {
-                        // ChannelCommand {
-                        //     default: [BaseCommand],
-                        //     type: CommandTypes
-                        // };
-                        //}
+                        /* 
+                            ChannelCommand {
+                                default: [BaseCommand],
+                                type: CommandTypes
+                            };
+                        */
                         default: { type: CommandTypes } & (new (client: Client) => ChannelCommand | SlashCommand);
                     } = await import(`${from}/${folderName}/${cmdFileName}`).catch((error) =>
                         this.client.logger.error(
@@ -118,7 +119,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                 this.client.logger.info(`Command ${this.size} imported.`, 'CommandManager');
             }
         } catch (error) {
-            return Promise.reject(error);
+            this.client.logger.error(error as Error, 'CommandManager');
         }
     }
 
@@ -126,7 +127,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
      * Handle channel and interaction commands.
      * @param { object } context - Message or CommandInteraction.
      * @param { string } prefix - The prefix what was used with the command.
-     * @returns { Promise<void> } Command execution...
+     * @returns { Promise } Command execution...
      */
     public async handle(context: Message | CommandInteraction, prefix: string): Promise<void> {
         const startTime = Date.now();
@@ -139,12 +140,12 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                 false,
             ) as BaseCommand;
 
-            if (context instanceof Message && !context.content.startsWith(prefix) && !command) return;
-            if (!command?.checkPermissions(context)) return;
+            if ((context instanceof Message && !context.content.startsWith(prefix)) || !command) return;
+            //if (!command.checkPermissions(context)) return;
 
             if (!command.execute)
-                return this.client.logger.warn(
-                    `Command ${command.data.name} has not execute function.`,
+                return this.client.logger.error(
+                    new Error(`Command ${command.data.name} has not execute function.`),
                     'CommandManager',
                 );
 
@@ -158,15 +159,14 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                 .catch((error: Error) => {
                     this.client.logger.error(error, 'CommandManager');
                 });
-            const endTime = Date.now();
             this.client.logger.log(
-                `Command ${command.data.name} was executed in ${endTime - startTime}ms by ${
+                `Command ${command.data.name} was executed in ${Date.now() - startTime}ms by ${
                     (context as CommandInteraction).user?.tag ?? (context as Message).author.tag
                 }. `,
                 'CommandManager',
             );
         } catch (error) {
-            this.client.logger.error(error instanceof Error ? error : new Error(error as string), 'CommandManager');
+            this.client.logger.error(error as Error, 'CommandManager');
         }
     }
 }

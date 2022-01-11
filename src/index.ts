@@ -6,6 +6,7 @@ dotenv.config();
 
 const bot = new Client({
     intents: 32767,
+    partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 });
 
 bot.setup()

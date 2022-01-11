@@ -27,6 +27,7 @@
                 "node_modules/*"
             ]
         },
+        "resolveJsonModule": true,
     },
     "ts-node": {
         "files": true,

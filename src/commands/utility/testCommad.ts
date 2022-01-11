@@ -1,5 +1,5 @@
-import { ChannelCommand, ChannelExecuteContext } from '../../structures/ChannelCommand';
-import createCommand from '../../util/decorators/createCommand';
+import { ChannelCommand, ChannelExecuteContext as context } from '../../structures/ChannelCommand';
+import { createCommand } from '../../util/decorators/createCommand';
 
 @createCommand({
     name: 'test',
@@ -10,7 +10,7 @@ import createCommand from '../../util/decorators/createCommand';
     aliases: ['test'],
 })
 export default class testCommand extends ChannelCommand {
-    public async execute({ msg }: ChannelExecuteContext): Promise<void> {
-        return void msg.channel.send('test');
+    public async execute({ msg }: context): Promise<void> {
+        msg;
     }
 }

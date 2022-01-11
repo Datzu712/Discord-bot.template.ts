@@ -133,4 +133,15 @@ export default class Logger {
         console.log(`${magenta}${textLog}`, reset);
         this.write(textLog, LoggerLevel.debug);
     }
+
+    /**
+     * Set the notifier function to use it in the error logs.
+     * @param { notifier } notifier - The notifier function.
+     * @returns void
+     */
+    public setNotifier(notifier: LikeFunction<void> | unknown): void {
+        if (typeof notifier !== 'function') return;
+
+        this.notifier = notifier as LikeFunction<void>;
+    }
 }

@@ -1,7 +1,8 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/indent */
 import { Message, MessageEmbed } from 'discord.js';
 import { ChannelCommand, ChannelExecuteContext } from '../../structures/ChannelCommand';
-import createCommand from '../../util/decorators/createCommand';
+import { createCommand, OnlyForDevelopers as devsOnly } from '../../util/decorators/createCommand';
 import util from 'util';
 import beautify from 'js-beautify';
 
@@ -12,10 +13,10 @@ import beautify from 'js-beautify';
     usage: 'eval [code]',
     guildOnly: true,
     aliases: ['e'],
-    devOnly: true,
     permissions: {},
 })
-export default class testCommand extends ChannelCommand {
+export default class EvalCommand extends ChannelCommand {
+    @devsOnly()
     public async execute({ msg, args }: ChannelExecuteContext): Promise<Message> {
         const startTime = Date.now();
 
@@ -66,10 +67,10 @@ export default class testCommand extends ChannelCommand {
                             `${
                                 input.length <= 500
                                     ? `📥 Input ${`\`\`\`js\n${beautify(input, {
-                                          indent_size: 4,
-                                          space_in_empty_paren: true,
-                                          jslint_happy: true,
-                                      })}\n\`\`\``}`
+                                        indent_size: 4,
+                                        space_in_empty_paren: true,
+                                        jslint_happy: true,
+                                    })}\n\`\`\``}`
                                     : ''
                             }📤 **Output (${Date.now() - startTime}ms)**\n` +
                                 `\`\`\`js\n${this.client.utils.replaceBannedWords(output)}\n\`\`\``,
