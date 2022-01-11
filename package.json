@@ -29,6 +29,7 @@
     "dotenv": "^10.0.0",
     "eslint": "^8.2.0",
     "fs-extra": "^10.0.0",
+    "i18next": "^21.6.5",
     "js-beautify": "^1.14.0",
     "moment": "^2.29.1",
     "mongoose": "^6.0.14",

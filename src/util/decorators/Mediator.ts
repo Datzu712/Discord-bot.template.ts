@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function Mediator(fn: (ctx: any, next: () => void) => Promise<void>): any {
+export function Mediator(fn: (ctx: any, next: () => unknown) => Promise<unknown>): any {
     // TODO: fix this types.
     return (target: new (...args: unknown[]) => unknown, _: never, propertyDescriptor: PropertyDescriptor) => {
         const oldFn = propertyDescriptor.value;

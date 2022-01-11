@@ -4,7 +4,7 @@ import { BaseCommand, CommandTypes, IBaseCommand, ExecuteCommandOptions } from '
 import Client from '../../core/Client';
 import Category from '../../structures/BaseCategory';
 import { Mediator } from './Mediator';
-import { CommandInteraction, GuildMember } from 'discord.js';
+import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
 
 /** Create a new command decorator. */
 export function createCommand(data: DeepPartial<IBaseCommand['data']>): any {
@@ -48,8 +48,8 @@ export function createCommand(data: DeepPartial<IBaseCommand['data']>): any {
 export function OnlyForDevelopers() {
     return Mediator(async (context: ExecuteCommandOptions | CommandInteraction, next: LikeFunction<void>) => {
         if (
-            (context as CommandInteraction).user.id === '444295883182309378' ||
-            (context as ExecuteCommandOptions).msg.author.id === '444295883182309378'
+            (context as CommandInteraction).user?.id === '444295883182309378' ||
+            (context as ExecuteCommandOptions).msg?.author?.id === '444295883182309378'
         ) {
             next();
         }
@@ -61,14 +61,25 @@ export function OnlyForDevelopers() {
  * @description Before execute the command, this decorator will create another function that evaluates if the author of the message is in a voice channel.
  */
 export function RequireMemberVoiceConnection() {
-    return Mediator(async (context: ExecuteCommandOptions | CommandInteraction, next: LikeFunction<void>) => {
+    return Mediator(async (context: ExecuteCommandOptions | CommandInteraction, next: LikeFunction<unknown>) => {
+        const reply = (options: { content?: string; embeds?: MessageEmbed[] }) =>
+            context instanceof CommandInteraction
+                ? context.reply({ ...options, ephemeral: true })
+                : (context as ExecuteCommandOptions).msg
+                    .reply({ ...options }) // eslint-disable-line prettier/prettier
+                    .catch(() => context.msg.channel.send(options)); // eslint-disable-line prettier/prettier
+
         const voiceChannel =
             ((context as CommandInteraction)?.member as GuildMember)?.voice.channel ||
             ((context as ExecuteCommandOptions).msg.member as GuildMember)?.voice.channel;
 
         if (!voiceChannel) {
-            next;
+            return reply({
+                content: 'You need to be in a voice channel to use this command.',
+            });
         }
+
+        next();
         /*
         
             if (!message.member?.voice?.channel) {
