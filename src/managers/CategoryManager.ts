@@ -56,12 +56,11 @@ class CategoryManager extends Map<string, ICategory> {
                 */
                 const Category: {
                     default: Category;
-                } = await import(`${from}/${fileName}`).catch((error: Error) =>
-                    this.client.logger.error(
-                        new Error(`Failed to import category ${fileName}: ` + error.message),
-                        'CategoryManager',
-                    ),
-                );
+                } = await import(`${from}/${fileName}`).catch((error: Error) => {
+                    error.stack = `Failed to import category ${fileName}: ` + error.stack;
+
+                    this.client.logger.error(error, 'CategoryManager');
+                });
 
                 if (!Category?.default) {
                     this.client.logger.warn(

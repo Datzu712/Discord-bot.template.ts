@@ -1,81 +1,70 @@
-export interface KeywordOptions {
-    name: string;
+import Client from '../core/Client';
+import { Keyword } from '../structures/Keyword';
+import { GuildMember, User, TextChannel } from 'discord.js';
 
-    aliases: string[] | null;
+export class KeywordManager {
+    public global: Map<string, Keyword>;
 
-    description: string | null;
-
-    usage: string | null;
-
-    inputType: {
-        url?: boolean;
-        number?: boolean;
-        string?: boolean;
-        boolean?: boolean;
-        channel?: boolean;
-        role?: boolean;
-        user?: boolean;
-        member?: boolean;
-        guild?: boolean;
-    };
-    displayErrors: boolean;
-}
-
-export class KeywordManager implements KeywordOptions {
-    /** Keyword name. */
-    public name: string;
-
-    /** Keyword aliases. */
-    public aliases: string[] | null;
-
-    /** Keyword description. */
-    public description: string | null;
-
-    /** Keyword usage. */
-    public usage: string | null;
-
-    /** Base on the input type, we throw an error (if KeywordOptions.displayErrors is enabled). (--keyword input) */
-    public inputType: {
-        /**  */
-        url?: boolean;
-        number?: boolean;
-        string?: boolean;
-        boolean?: boolean;
-        channel?: boolean;
-        role?: boolean;
-        user?: boolean;
-        member?: boolean;
-        guild?: boolean;
-    };
-
-    /** If it is enabled, bot will throw an error when a input type is not fulfilled. */
-    public displayErrors = false;
-    /**
-     * @desc Keyword prefix. Default --
-     * @example <prefix>keyword <input>
-     */
-    public prefix = '--';
+    constructor(public client: Client) {
+        this.global = new Map();
+    }
 
     /**
-     * @param { KeywordOptions } options - Keyword options.
+     * Add a keyword to the global keyword list.
+     * @param { Keyword } keyword - Keyword to add.
      */
-    constructor({ name, aliases, description, usage, inputType, displayErrors }: RequireAtLeastOneOf<KeywordOptions>) {
-        if (!name || !inputType) {
-            throw new Error(
-                `Keyword ${!name ? 'name' : 'inputType'} is required. (KeywordOptions.${!name ? 'name' : 'inputType'})`,
-            );
+    public add(keyword: Keyword): void {
+        this.global.set(keyword.name, keyword);
+    }
+
+    public parse(input: string, customKeywords: Keyword[] | undefined = []) {
+        const args = input.toLowerCase().split(' ');
+
+        // Keywords detected with respective arguments (this is the return value)
+        const parsed: Map<string, string[] | boolean | number | GuildMember | User | TextChannel> = new Map();
+
+        // Global and local keywords together
+        const keywords = [...Array.from(this.global.values()), ...customKeywords];
+
+        // Name of all keywords to check if any match with the input arguments
+        const keywordNames: string[] = [];
+
+        // include all aliases of each keywords
+        for (const keyword of keywords) {
+            if (!(keyword instanceof Keyword)) {
+                this.client.logger.error(new Error('An invalid keyword was provided.'));
+            }
+            // Keyword name
+            keywordNames.push(`${keyword.prefix}${keyword.name}`);
+
+            // Keyword aliases
+            if (keyword.aliases) {
+                for (const alias of keyword.aliases) {
+                    keywordNames.push(`${keyword.prefix}${alias}`);
+                }
+            }
         }
-        if (Object.keys(inputType).length >= 0 || Object.keys(inputType).length > 1) {
-            // idk if we could accept more than one input type.
-            throw new Error(
-                `Keyword inputType must be a single type. Received ${Object.keys(inputType).length} (Expected 1)`,
-            );
+        // Include all keyword names to this regex.
+        const keywordRegex = new RegExp(keywordNames.join('|'));
+        if (!keywordRegex.test(input)) return parsed;
+
+        // Array
+        let keywordTarget: string[] | undefined = undefined;
+
+        // check all arguments
+        for (const arg of args) {
+            // If the arg is a keyword
+            if (keywordRegex.test(arg)) {
+                if (!parsed.has(arg)) {
+                    parsed.set(arg, []);
+                }
+                keywordTarget = parsed.get(arg) as string[];
+            }
+            if (!keywordTarget) {
+                continue;
+            }
+            keywordTarget.push(arg);
         }
-        this.name = name;
-        this.aliases = aliases ?? null;
-        this.description = description ?? null;
-        this.usage = usage ?? null;
-        this.inputType = inputType;
-        this.displayErrors = displayErrors ?? false;
+        return parsed;
     }
 }

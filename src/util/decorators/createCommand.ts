@@ -62,6 +62,7 @@ export function OnlyForDevelopers() {
  */
 export function RequireMemberVoiceConnection() {
     return Mediator(async (context: ExecuteCommandOptions | CommandInteraction, next: LikeFunction<unknown>) => {
+        // Interaction reply or message reply.
         const reply = (options: { content?: string; embeds?: MessageEmbed[] }) =>
             context instanceof CommandInteraction
                 ? context.reply({ ...options, ephemeral: true })

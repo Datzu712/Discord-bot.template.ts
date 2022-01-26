@@ -26,7 +26,7 @@ class Client extends djs.Client {
         const debugMode = process.env.CLIENT_MODE === 'development' ? true : false;
 
         this.logger = new Logger(resolve(`${__dirname}/../../logs`));
-        this.logger.setTextTemplate('[<dateNow>] [<level>] [<serviceName>] - `<message>`');
+        this.logger.setTextTemplate('[<dateNow>] [<level>] [<serviceName>] - <message>');
 
         this.commands = new CommandManager(this, debugMode);
         this.categories = new CategoryManager(this, debugMode);

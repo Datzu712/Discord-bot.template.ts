@@ -1,5 +1,4 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/indent */
 import { Message, MessageEmbed } from 'discord.js';
 import { ChannelCommand, ChannelExecuteContext } from '../../structures/ChannelCommand';
 import { createCommand, OnlyForDevelopers as devsOnly } from '../../util/decorators/createCommand';

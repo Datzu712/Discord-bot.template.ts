@@ -5,9 +5,12 @@ import { PathLike, readdirSync } from 'fs-extra';
 import { SlashCommand } from '../structures/SlashCommand';
 import { CommandInteraction, Message } from 'discord.js';
 import { BaseCommand, CommandTypes } from '../structures/BaseCommand';
+import { KeywordManager } from './KeywordManager';
 
 // TODO: Maybe extend by Set than Map?
 class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
+    private keywords: KeywordManager;
+
     /**
      * Constructor of the CategoryManager.
      * @param { Client } client - Client instance.
@@ -15,6 +18,8 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
      */
     public constructor(public client: Client, private debug?: boolean) {
         super();
+
+        this.keywords = new KeywordManager(this.client);
     }
 
     /**
@@ -76,12 +81,11 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                             };
                         */
                         default: { type: CommandTypes } & (new (client: Client) => ChannelCommand | SlashCommand);
-                    } = await import(`${from}/${folderName}/${cmdFileName}`).catch((error) =>
-                        this.client.logger.error(
-                            new Error(`Failed to import command ${cmdFileName}. ` + error),
-                            'CommandManager',
-                        ),
-                    );
+                    } = await import(`${from}/${folderName}/${cmdFileName}`).catch((error: Error) => {
+                        error.stack = `Failed to import the command: ${cmdFileName}. ` + error.stack;
+
+                        this.client.logger.error(error, 'CommandManager');
+                    });
 
                     if (!Command?.default) {
                         this.client.logger.warn(`Command ${cmdFileName} is invalid.`, 'CommandManager');
