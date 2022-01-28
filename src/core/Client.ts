@@ -8,6 +8,7 @@ import { resolve } from 'path';
 import Util from '../util/Util';
 
 import('../structures/Guild');
+import('../structures/Message');
 
 class Client extends djs.Client {
     public readonly commands: CommandManager;

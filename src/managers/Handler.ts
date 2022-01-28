@@ -6,6 +6,11 @@ export default class CommandHandler {
 
     // todo
     private createChart(command: BaseCommand) {
+        // Create MongoDB charts for commands (:
         command;
+    }
+
+    public async run() {
+        // todo
     }
 }

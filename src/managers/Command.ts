@@ -25,7 +25,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
     /**
      * Get command by name.
      * @param { string } name - Command name.
-     * @param { boolean } sloppy - If true, will return the first category that matches the name.
+     * @param { boolean } sloppy - True for return the first command that matches with the name (included aliases).
      * @returns { ICommand | null } command or null.
      */
     public get(name: string, sloppy?: boolean): ChannelCommand | SlashCommand | undefined {
