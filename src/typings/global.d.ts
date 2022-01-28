@@ -1,8 +1,10 @@
 /**
  * Like function global type.
  * R = return type
+ * 
+ * A = arguments
  */
-declare type LikeFunction<R> = (...args: any[]) => R;
+declare type LikeFunction<R, A = any[]> = (args: A) => R;
 
 /**
  * Type for function object property params.

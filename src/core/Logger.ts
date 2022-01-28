@@ -23,7 +23,7 @@ export default class Logger {
     private dateFormat: Intl.DateTimeFormat;
     private textTemplate = `[<dateNow>] [<serviceName>] [<level>] <message>`;
 
-    public notifier!: (error: Error) => void;
+    public notifier!: LikeFunction<void, Error>;
 
     constructor(public folderLogsPath: string, public debugAllowed = false) {
         this.dateFormat = Intl.DateTimeFormat('en', {
@@ -154,9 +154,5 @@ export default class Logger {
      * @param { notifier } notifier - The notifier function.
      * @returns void
      */
-    public setNotifier(notifier: LikeFunction<void> | unknown): void {
-        if (typeof notifier !== 'function') return;
-
-        this.notifier = notifier as LikeFunction<void>;
-    }
+    public setNotifier = (notifier: LikeFunction<void, Error>) => (this.notifier = notifier);
 }
