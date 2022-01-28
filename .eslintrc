@@ -1,15 +1,17 @@
 {
-        "root": true,
-        "parser": "@typescript-eslint/parser",
-        "plugins": [
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
         "@typescript-eslint",
-        "prettier"
+        "prettier",
+        "security"
     ],
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
-        "prettier"
+        "prettier",
+        "plugin:security/recommended"
     ],
     "rules": {
         "array-callback-return": 1,

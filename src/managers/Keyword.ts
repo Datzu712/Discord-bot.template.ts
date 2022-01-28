@@ -25,7 +25,7 @@ export class KeywordManager {
 
         // Global and local keywords together
         const keywords = [...Array.from(this.global.values()), ...customKeywords];
-
+        console.log(keywords);
         // Name of all keywords to check if any match with the input arguments
         const keywordNames: string[] = [];
 
@@ -44,7 +44,7 @@ export class KeywordManager {
                 }
             }
         }
-        // Include all keyword names to this regex.
+        // Include all keyword names (with aliases) to this regex.
         const keywordRegex = new RegExp(keywordNames.join('|'));
         if (!keywordRegex.test(input)) return parsed;
 

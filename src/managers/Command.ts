@@ -5,7 +5,7 @@ import { PathLike, readdirSync } from 'fs-extra';
 import { SlashCommand } from '../structures/SlashCommand';
 import { CommandInteraction, Message } from 'discord.js';
 import { BaseCommand, CommandTypes } from '../structures/BaseCommand';
-import { KeywordManager } from './KeywordManager';
+import { KeywordManager } from './Keyword';
 
 // TODO: Maybe extend by Set than Map?
 class CommandManager extends Map<string, ChannelCommand | SlashCommand> {

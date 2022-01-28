@@ -1,9 +1,9 @@
 import djs from 'discord.js';
 import Logger from './Logger';
-import CategoryManager from '../managers/CategoryManager';
-import CommandManager from '../managers/CommandManager';
+import CategoryManager from '../managers/Category';
+import CommandManager from '../managers/Command';
 import Mongodb from '../database/mongoose';
-import EventManager from '../managers/EventManager';
+import EventManager from '../managers/Event';
 import { resolve } from 'path';
 import Util from '../util/Util';
 
@@ -23,7 +23,7 @@ class Client extends djs.Client {
     constructor(options: djs.ClientOptions) {
         super(options);
 
-        const debugMode = process.env.CLIENT_MODE === 'development' ? true : false;
+        const debugMode = process.env.NODE_ENV === 'development' ? true : false;
 
         this.logger = new Logger(resolve(`${__dirname}/../../logs`));
         this.logger.setTextTemplate('[<dateNow>] [<level>] [<serviceName>] - <message>');

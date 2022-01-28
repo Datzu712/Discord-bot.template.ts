@@ -17,8 +17,7 @@ export default class testCommand extends ChannelCommand {
             name: 'test',
             aliases: ['test'],
             description: 'Test command',
-            usage: 'test',
-            inputType: { url: true },
+            inputType: { string: true },
             displayErrors: true,
         },
     ])

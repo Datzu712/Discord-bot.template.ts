@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/indent */
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandTypes } from '../../structures/BaseCommand';
 
@@ -17,7 +16,6 @@ export function test(input: (arg: SlashCommandBuilder) => SlashCommandBuilder) {
     };
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export function slashBuilder(builder: SlashCommandBuilder) {
     return function decorate<T extends { type: CommandTypes } & (new (...args: any[]) => object)>(constructor: T) {
         if (constructor.type === 'CHANNEL_COMMAND')

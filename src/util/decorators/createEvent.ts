@@ -1,5 +1,5 @@
 import Client from '../../core/Client';
-import BaseEvent, { EventsTypes, events } from '../../managers/EventManager';
+import BaseEvent, { EventsTypes, events } from '../../managers/Event';
 
 /** Create a new command command, use second param only for slash commands */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

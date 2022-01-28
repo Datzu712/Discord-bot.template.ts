@@ -32,6 +32,7 @@ export default class EvalCommand extends ChannelCommand {
             );
 
             input = input.replaceAll('--async', '');
+            // this eval have the all context of the client, and it is safe if you trust in the developers what they are in the dev whitelist.
             let output = await eval(input);
             if (typeof output !== 'string')
                 output = util.inspect(output, { depth: 0, maxStringLength: 4000, maxArrayLength: 3000 });
@@ -57,7 +58,6 @@ export default class EvalCommand extends ChannelCommand {
                             `\`\`\`js\n${this.client.utils.replaceBannedWords(output)}\n\`\`\``,
                         ),
                     ],
-                    content: null,
                 });
             } else if (output.length <= 4000) {
                 return msg.channel.send({
@@ -75,7 +75,6 @@ export default class EvalCommand extends ChannelCommand {
                                 `\`\`\`js\n${this.client.utils.replaceBannedWords(output)}\n\`\`\``,
                         ),
                     ],
-                    content: null,
                 });
             } else {
                 return msg.channel.send({
@@ -86,11 +85,10 @@ export default class EvalCommand extends ChannelCommand {
                                 `Output too long. ${'`'}${await this.client.utils.sourcebin(output)}${'`'}`,
                             ),
                     ],
-                    content: null,
                 });
             }
         } catch (error) {
-            return baseMessage.edit(`(${Date.now() - startTime}ms) Error: ` + `\`\`\`js\n${error}\n\`\`\``);
+            return baseMessage.edit(`(${Date.now() - startTime}ms) Error: ` + `\`\`\`js\n${(error as Error).stack}\n\`\`\``);
         }
     }
 }

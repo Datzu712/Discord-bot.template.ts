@@ -47,10 +47,9 @@ export function createCommand(data: DeepPartial<IBaseCommand['data']>): any {
  */
 export function OnlyForDevelopers() {
     return Mediator(async (context: ExecuteCommandOptions | CommandInteraction, next: LikeFunction<void>) => {
-        if (
-            (context as CommandInteraction).user?.id === '444295883182309378' ||
-            (context as ExecuteCommandOptions).msg?.author?.id === '444295883182309378'
-        ) {
+        const userId = (context as CommandInteraction).user?.id ?? (context as ExecuteCommandOptions).msg?.author?.id;
+
+        if (userId === '444295883182309378') {
             next();
         }
     });

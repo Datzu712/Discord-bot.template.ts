@@ -5,8 +5,6 @@ export interface KeywordOptions {
 
     description: string | null;
 
-    usage: string | null;
-
     inputType: {
         url?: boolean;
         number?: boolean;
@@ -37,9 +35,6 @@ export class Keyword implements KeywordOptions {
     /** Keyword description. */
     public description: string | null;
 
-    /** Keyword usage. */
-    public usage: string | null;
-
     /** Keyword  */
     public enabled: boolean;
 
@@ -57,7 +52,7 @@ export class Keyword implements KeywordOptions {
         guild?: boolean;
     };
 
-    /** If it is enabled, bot will throw an error when a input type is not fulfilled. */
+    /** If it is enabled, bot will send an error to the user when a input type is not fulfilled. */
     public displayErrors: boolean;
     /**
      * @desc Keyword prefix. Default --
@@ -74,7 +69,6 @@ export class Keyword implements KeywordOptions {
         name,
         aliases,
         description,
-        usage,
         inputType,
         displayErrors,
         prefix,
@@ -92,7 +86,6 @@ export class Keyword implements KeywordOptions {
         this.name = name;
         this.aliases = aliases ?? null;
         this.description = description ?? null;
-        this.usage = usage ?? null;
         this.inputType = inputType;
         this.displayErrors = displayErrors ?? false;
         this.prefix = prefix ?? '--';
