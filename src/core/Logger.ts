@@ -23,8 +23,9 @@ export default class Logger {
     private dateFormat: Intl.DateTimeFormat;
     private textTemplate = `[<dateNow>] [<serviceName>] [<level>] <message>`;
 
-    ///<reference path="global.d.ts">
-    constructor(public folderLogsPath: string, public notifier?: LikeFunction<void>) {
+    public notifier!: (error: Error) => void;
+
+    constructor(public folderLogsPath: string, public debugAllowed = false) {
         this.dateFormat = Intl.DateTimeFormat('en', {
             dateStyle: 'short',
             timeStyle: 'medium',
@@ -85,11 +86,23 @@ export default class Logger {
     private getFileLog(level: LoggerLevel): WriteStream {
         if (!existsSync(this.folderLogsPath)) mkdir(this.folderLogsPath);
 
+        let fileType: 'log' | 'debug' | 'error' = 'log';
+
+        // For have a better logs, we divide it in different files (Error, debug and log).
+        // Error > only errors
+        // debug > only debug
+        // log > Rest of the logs (warn, info, log, etc)
+        if (level === LoggerLevel.debug || level === LoggerLevel.error) {
+            fileType = level === LoggerLevel.debug ? 'debug' : 'error';
+        }
+
         return createWriteStream(
             `${this.folderLogsPath}/${moment().format('l').replaceAll('/', '-')}${
-                level === LoggerLevel.error ? '-error' : ''
+                fileType === 'log' ? '' : fileType
             }.log`,
-            { flags: 'a' },
+            {
+                flags: 'a',
+            },
         );
     }
 
@@ -128,10 +141,12 @@ export default class Logger {
     }
 
     public debug(message: string, serviceName?: string): void {
-        const textLog = this.resolveTextLog({ message, level: LoggerLevel.debug, serviceName });
+        if (this.debugAllowed) {
+            const textLog = this.resolveTextLog({ message, level: LoggerLevel.debug, serviceName });
 
-        console.log(`${magenta}${textLog}`, reset);
-        this.write(textLog, LoggerLevel.debug);
+            console.log(`${magenta}${textLog}`, reset);
+            this.write(textLog, LoggerLevel.debug);
+        }
     }
 
     /**

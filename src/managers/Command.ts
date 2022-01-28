@@ -16,7 +16,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
      * @param { Client } client - Client instance.
      * @param { boolean } debug - If debug is true, will send more details in the console about importing commands.
      */
-    public constructor(public client: Client, private debug?: boolean) {
+    public constructor(public client: Client) {
         super();
 
         this.keywords = new KeywordManager(this.client);
@@ -112,15 +112,15 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                         command,
                     );
 
-                    if (this.debug)
-                        this.client.logger.debug(
-                            `${Command.default.type === 'CHANNEL_COMMAND' ? 'Command' : 'Slash command'} ${
-                                command.data.name
-                            } was imported.`,
-                            'CommandManager',
-                        );
+                    // Debug
+                    this.client.logger.debug(
+                        `${Command.default.type === 'CHANNEL_COMMAND' ? 'Command' : 'Slash command'} ${
+                            command.data.name
+                        } was imported.`,
+                        'CommandManager',
+                    );
                 }
-                this.client.logger.info(`Command ${this.size} imported.`, 'CommandManager');
+                this.client.logger.info(`${this.size} commands imported.`, 'CommandManager');
             }
         } catch (error) {
             this.client.logger.error(error as Error, 'CommandManager');

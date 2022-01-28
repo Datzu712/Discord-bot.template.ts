@@ -5,7 +5,7 @@ import Client from '../core/Client';
 
 const unknownCategory = new Category({
     name: ['unknown', '📕'],
-    description: 'Unknown commands.',
+    description: 'Nothing to see here!',
     hidden: true,
 });
 
@@ -16,7 +16,7 @@ class CategoryManager extends Map<string, ICategory> {
      * @param { Client } client - Client instance.
      * @param { boolean } debug - If debug is true, will send more details in the console about importing categories.
      */
-    constructor(public client: Client, private debug?: boolean) {
+    constructor(public client: Client) {
         super();
     }
 
@@ -74,7 +74,7 @@ class CategoryManager extends Map<string, ICategory> {
                 const category = Category.default;
                 this.set(category.name[0], category);
 
-                if (this.debug) this.client.logger.debug(`Category ${category.name[0]} imported.`, 'CategoryManager');
+                this.client.logger.debug(`Category ${category.name[0]} imported.`, 'CategoryManager');
             }
 
             // Then of import categories, search if one of they have subcategories
@@ -90,11 +90,8 @@ class CategoryManager extends Map<string, ICategory> {
                     subcategory = unknownCategory;
                 }
                 category.subcategory = subcategory;
-                if (this.debug)
-                    this.client.logger.debug(
-                        `Subcategory ${subcategory.name[0]} of ${name} imported.`,
-                        'CategoryManager',
-                    );
+
+                this.client.logger.debug(`Subcategory ${subcategory.name[0]} of ${name} imported.`, 'CategoryManager');
             }
             return this.client.logger.log(`${files.length} categories imported.`, 'CategoryManager');
         } catch (error) {
@@ -127,8 +124,8 @@ class CategoryManager extends Map<string, ICategory> {
             }
 
             category.commands.set(name, command);
-            if (this.debug)
-                this.client.logger.debug(`Command ${name} added to category ${category.name[0]}`, 'CategoryManager');
+
+            this.client.logger.debug(`Command ${name} added to category ${category.name[0]}`, 'CategoryManager');
         }
     }
 }
