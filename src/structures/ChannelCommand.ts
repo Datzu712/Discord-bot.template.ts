@@ -9,7 +9,7 @@ export interface ChannelExecuteContext {
     msg: Message;
 }
 
-export class ChannelCommand extends BaseCommand implements IBaseCommand {
+export class ChannelCommand extends BaseCommand {
     /** Command type. (Disable slash command decorators). */
     static readonly type: CommandTypes = 'CHANNEL_COMMAND';
 
@@ -36,7 +36,7 @@ export class ChannelCommand extends BaseCommand implements IBaseCommand {
      * @param { Message } msg - Message object.
      * @returns { object } If the command can be executed.
      */
-    public checkPermissionsFor(message: Message): { continue: boolean; error?: string } {
+    public permissionsFor(message: Message): { continue: boolean; error?: string } {
         // Check if the command can be only used in a guild.
         if (this.data.guildOnly && !message.guild) {
             return { continue: false, error: 'You must be in a server to use this command!' };

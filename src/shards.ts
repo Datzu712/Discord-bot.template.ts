@@ -7,7 +7,7 @@ dotnev.config();
 const logger = new Logger('../logs');
 
 const totalShards =
-    process.env.CLIENT_SHARD_CONFIG === 'auto' ? 'auto' : parseInt(process.env.CLIENT_SHARD_CONFIG as string);
+    process.env.CLIENT_SHARD_CONFIG === 'auto' ? 'auto' : parseInt(process.env.CLIENT_SHARDS_COUNT as string);
 
 const shardManager = new ShardingManager(resolve(`${__dirname}/index.js`), {
     token: process.env.BOT_TOKEN,

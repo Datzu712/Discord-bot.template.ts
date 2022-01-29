@@ -1,5 +1,5 @@
 import Client from '../core/Client';
-import { Keyword } from '../structures/Keyword';
+import { Keyword } from '../structures/Keywords';
 import { GuildMember, User, TextChannel } from 'discord.js';
 
 export class KeywordManager {
@@ -25,6 +25,8 @@ export class KeywordManager {
 
         // Global and local keywords together
         const keywords = [...Array.from(this.global.values()), ...customKeywords];
+        this.client.logger.debug(`Parsing... Detected ${keywords.length} keywords.`, 'KeywordManager');
+
         console.log(keywords);
         // Name of all keywords to check if any match with the input arguments
         const keywordNames: string[] = [];
@@ -60,9 +62,11 @@ export class KeywordManager {
                 }
                 keywordTarget = parsed.get(arg) as string[];
             }
+            // If there is not a keyword target, skip this argument
             if (!keywordTarget) {
                 continue;
             }
+            // Push the argument to the keyword target
             keywordTarget.push(arg);
         }
         return parsed;

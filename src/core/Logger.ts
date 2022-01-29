@@ -41,6 +41,7 @@ export default class Logger {
     private write(message: string, level: LoggerLevel): void {
         const file = this.getFileLog(level);
         file.write(`${message}\n`);
+        file.close();
     }
 
     /**
@@ -98,7 +99,7 @@ export default class Logger {
 
         return createWriteStream(
             `${this.folderLogsPath}/${moment().format('l').replaceAll('/', '-')}${
-                fileType === 'log' ? '' : fileType
+                fileType === 'log' ? '' : `-${fileType}`
             }.log`,
             {
                 flags: 'a',

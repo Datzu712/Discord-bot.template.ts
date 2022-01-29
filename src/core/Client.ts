@@ -1,7 +1,7 @@
 import djs from 'discord.js';
 import Logger from './Logger';
-import CategoryManager from '../managers/Category';
-import CommandManager from '../managers/Command';
+import CategoryManager from '../managers/Categories';
+import CommandManager from '../managers/Commands';
 import Mongodb from '../database/mongoose';
 import EventManager from '../managers/Event';
 import { resolve } from 'path';

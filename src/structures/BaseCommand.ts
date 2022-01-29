@@ -3,7 +3,7 @@ import { Message, PermissionString } from 'discord.js';
 import { PathLike } from 'fs-extra';
 import Client from '../core/Client';
 import Category from './BaseCategory';
-import { Keyword } from './Keyword';
+import { Keyword } from './Keywords';
 
 export type CommandTypes = 'SLASH_COMMAND' | 'CHANNEL_COMMAND';
 
@@ -65,7 +65,7 @@ export abstract class BaseCommand implements IBaseCommand {
     /** Command type. (Disable slash command decorator). */
     public static readonly type: CommandTypes;
 
-    public keyword: Keyword[] = [];
+    public keywords: Keyword[] = [];
 
     /**
      * Construct new command.

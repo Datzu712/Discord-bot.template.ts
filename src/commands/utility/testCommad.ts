@@ -1,4 +1,4 @@
-import { Keyword } from '../../structures/Keyword';
+import { Keyword } from '../../structures/Keywords';
 import { ChannelCommand, ChannelExecuteContext as context } from '../../structures/ChannelCommand';
 import { createCommand } from '../../util/decorators/createCommand';
 import { addKeywords } from '../../util/decorators/createKeywords';

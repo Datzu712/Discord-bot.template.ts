@@ -1,16 +1,16 @@
+import { CommandInteraction, Message } from 'discord.js';
+import { PathLike, readdirSync } from 'fs-extra';
+import similarly from 'string-similarity';
+
 import Client from '../core/Client';
 import { ChannelCommand } from '../structures/ChannelCommand';
-import similarly from 'string-similarity';
-import { PathLike, readdirSync } from 'fs-extra';
 import { SlashCommand } from '../structures/SlashCommand';
-import { CommandInteraction, Message } from 'discord.js';
 import { BaseCommand, CommandTypes } from '../structures/BaseCommand';
-import { KeywordManager } from './Keyword';
+import CommandHandler from './Handler';
 
 // TODO: Maybe extend by Set than Map?
 class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
-    private keywords: KeywordManager;
-
+    private handler: CommandHandler;
     /**
      * Constructor of the CategoryManager.
      * @param { Client } client - Client instance.
@@ -19,7 +19,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
     public constructor(public client: Client) {
         super();
 
-        this.keywords = new KeywordManager(this.client);
+        this.handler = new CommandHandler(this.client);
     }
 
     /**
@@ -134,7 +134,6 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
      * @returns { Promise } Command execution...
      */
     public async handle(context: Message | CommandInteraction, prefix: string): Promise<void> {
-        const startTime = Date.now();
         try {
             // To search slash commands, we need to add the prefix '/'. (like: /{slashCommandName})
             const command = this.get(
@@ -149,27 +148,16 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
 
             if (!command.execute)
                 return this.client.logger.error(
-                    new Error(`Command ${command.data.name} has not execute function.`),
+                    new Error(`Command ${command.data.name} don't have a execute function. (${command.data.path})`),
                     'CommandManager',
                 );
 
+            this.handler.run(command, context);
+
             // Channel commands need arguments in the second parameter (args)...
-            await command
-                .execute(
-                    context instanceof Message
-                        ? { prefix, msg: context, args: context.content.slice(prefix.length).split(' ').slice(1) }
-                        : context,
-                )
-                .catch((error: Error) => {
-                    this.client.logger.error(error, 'CommandManager');
-                });
-            this.client.logger.log(
-                `Command ${command.data.name} was executed in ${Date.now() - startTime}ms by ${
-                    (context as CommandInteraction).user?.tag ?? (context as Message).author.tag
-                }. `,
-                'CommandManager',
-            );
         } catch (error) {
+            context.reply({ content: 'An error has ocurred. Try again later.' });
+
             this.client.logger.error(error as Error, 'CommandManager');
         }
     }

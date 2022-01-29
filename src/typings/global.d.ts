@@ -38,7 +38,7 @@ declare namespace NodeJS {
         DISCORD_WEBHOOK_URL: string;
 
         /** Discord bot shard config. */
-        CLIENT_SHARD_CONFIG: string;
+        CLIENT_SHARDS_COUNT: string;
 
         /** Client mode. */
         NODE_ENV: 'production' | 'development';

@@ -1,7 +1,10 @@
 import { Schema, model, Document } from 'mongoose';
 
 export interface PrefixInterface extends Document {
+    // Guild ID
     _id: string;
+
+    // Guild prefix
     prefix: string;
 }
 

@@ -1,4 +1,4 @@
-import { Keyword, KeywordOptions } from '../../structures/Keyword';
+import { Keyword, KeywordOptions } from '../../structures/Keywords';
 import { IBaseCommand } from '../../structures/BaseCommand';
 
 /**
