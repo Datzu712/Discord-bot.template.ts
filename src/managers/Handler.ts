@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from 'discord.js';
-import { SlashCommand } from '../structures/SlashCommand';
+// import { SlashCommand } from '../structures/SlashCommand';
 import Client from '../core/Client';
 import { BaseCommand } from '../structures/BaseCommand';
 import { KeywordManager } from './Keyword';
