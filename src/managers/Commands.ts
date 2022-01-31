@@ -1,26 +1,31 @@
+import { CommandInteraction, Message } from 'discord.js';
+import { PathLike, readdirSync } from 'fs-extra';
+import similarly from 'string-similarity';
+
 import Client from '../core/Client';
 import { ChannelCommand } from '../structures/ChannelCommand';
-import similarly from 'string-similarity';
-import { PathLike, readdirSync } from 'fs-extra';
 import { SlashCommand } from '../structures/SlashCommand';
-import { CommandInteraction, Message } from 'discord.js';
 import { BaseCommand, CommandTypes } from '../structures/BaseCommand';
+import CommandHandler from './Handler';
 
 // TODO: Maybe extend by Set than Map?
 class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
+    private handler: CommandHandler;
     /**
      * Constructor of the CategoryManager.
      * @param { Client } client - Client instance.
      * @param { boolean } debug - If debug is true, will send more details in the console about importing commands.
      */
-    public constructor(public client: Client, private debug?: boolean) {
+    public constructor(public client: Client) {
         super();
+
+        this.handler = new CommandHandler(this.client);
     }
 
     /**
      * Get command by name.
      * @param { string } name - Command name.
-     * @param { boolean } sloppy - If true, will return the first category that matches the name.
+     * @param { boolean } sloppy - True for return the first command that matches with the name (included aliases).
      * @returns { ICommand | null } command or null.
      */
     public get(name: string, sloppy?: boolean): ChannelCommand | SlashCommand | undefined {
@@ -76,12 +81,11 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                             };
                         */
                         default: { type: CommandTypes } & (new (client: Client) => ChannelCommand | SlashCommand);
-                    } = await import(`${from}/${folderName}/${cmdFileName}`).catch((error) =>
-                        this.client.logger.error(
-                            new Error(`Failed to import command ${cmdFileName}. ` + error),
-                            'CommandManager',
-                        ),
-                    );
+                    } = await import(`${from}/${folderName}/${cmdFileName}`).catch((error: Error) => {
+                        error.stack = `Failed to import the command: ${cmdFileName}. ` + error.stack;
+
+                        this.client.logger.error(error, 'CommandManager');
+                    });
 
                     if (!Command?.default) {
                         this.client.logger.warn(`Command ${cmdFileName} is invalid.`, 'CommandManager');
@@ -108,15 +112,15 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                         command,
                     );
 
-                    if (this.debug)
-                        this.client.logger.debug(
-                            `${Command.default.type === 'CHANNEL_COMMAND' ? 'Command' : 'Slash command'} ${
-                                command.data.name
-                            } was imported.`,
-                            'CommandManager',
-                        );
+                    // Debug
+                    this.client.logger.debug(
+                        `${Command.default.type === 'CHANNEL_COMMAND' ? 'Command' : 'Slash command'} ${
+                            command.data.name
+                        } was imported.`,
+                        'CommandManager',
+                    );
                 }
-                this.client.logger.info(`Command ${this.size} imported.`, 'CommandManager');
+                this.client.logger.info(`${this.size} commands imported.`, 'CommandManager');
             }
         } catch (error) {
             this.client.logger.error(error as Error, 'CommandManager');
@@ -130,7 +134,6 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
      * @returns { Promise } Command execution...
      */
     public async handle(context: Message | CommandInteraction, prefix: string): Promise<void> {
-        const startTime = Date.now();
         try {
             // To search slash commands, we need to add the prefix '/'. (like: /{slashCommandName})
             const command = this.get(
@@ -145,27 +148,16 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
 
             if (!command.execute)
                 return this.client.logger.error(
-                    new Error(`Command ${command.data.name} has not execute function.`),
+                    new Error(`Command ${command.data.name} don't have a execute function. (${command.data.path})`),
                     'CommandManager',
                 );
 
+            this.handler.run(command, context);
+
             // Channel commands need arguments in the second parameter (args)...
-            await command
-                .execute(
-                    context instanceof Message
-                        ? { prefix, msg: context, args: context.content.slice(prefix.length).split(' ').slice(1) }
-                        : context,
-                )
-                .catch((error: Error) => {
-                    this.client.logger.error(error, 'CommandManager');
-                });
-            this.client.logger.log(
-                `Command ${command.data.name} was executed in ${Date.now() - startTime}ms by ${
-                    (context as CommandInteraction).user?.tag ?? (context as Message).author.tag
-                }. `,
-                'CommandManager',
-            );
         } catch (error) {
+            context.reply({ content: 'An error has ocurred. Try again later.' });
+
             this.client.logger.error(error as Error, 'CommandManager');
         }
     }

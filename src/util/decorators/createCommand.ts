@@ -3,7 +3,7 @@
 import { BaseCommand, CommandTypes, IBaseCommand, ExecuteCommandOptions } from '../../structures/BaseCommand';
 import Client from '../../core/Client';
 import Category from '../../structures/BaseCategory';
-import { Mediator } from './Mediator';
+import { Middleware } from './Middleware';
 import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
 
 /** Create a new command decorator. */
@@ -46,11 +46,10 @@ export function createCommand(data: DeepPartial<IBaseCommand['data']>): any {
  * @description Before execute the command, this decorator will create another function that evaluates if the author of the message is a developer and then executes it if it is.
  */
 export function OnlyForDevelopers() {
-    return Mediator(async (context: ExecuteCommandOptions | CommandInteraction, next: LikeFunction<void>) => {
-        if (
-            (context as CommandInteraction).user?.id === '444295883182309378' ||
-            (context as ExecuteCommandOptions).msg?.author?.id === '444295883182309378'
-        ) {
+    return Middleware((context: ExecuteCommandOptions | CommandInteraction, next: LikeFunction<void>) => {
+        const userId = (context as CommandInteraction).user?.id ?? (context as ExecuteCommandOptions).msg?.author?.id;
+
+        if (userId === '444295883182309378') {
             next();
         }
     });
@@ -61,7 +60,8 @@ export function OnlyForDevelopers() {
  * @description Before execute the command, this decorator will create another function that evaluates if the author of the message is in a voice channel.
  */
 export function RequireMemberVoiceConnection() {
-    return Mediator(async (context: ExecuteCommandOptions | CommandInteraction, next: LikeFunction<unknown>) => {
+    return Middleware(async (context: ExecuteCommandOptions | CommandInteraction, next: LikeFunction<unknown>) => {
+        // Interaction reply or message reply.
         const reply = (options: { content?: string; embeds?: MessageEmbed[] }) =>
             context instanceof CommandInteraction
                 ? context.reply({ ...options, ephemeral: true })
@@ -70,12 +70,12 @@ export function RequireMemberVoiceConnection() {
                     .catch(() => context.msg.channel.send(options)); // eslint-disable-line prettier/prettier
 
         const voiceChannel =
-            ((context as CommandInteraction)?.member as GuildMember)?.voice.channel ||
+            ((context as CommandInteraction)?.member as GuildMember)?.voice.channel ??
             ((context as ExecuteCommandOptions).msg.member as GuildMember)?.voice.channel;
 
         if (!voiceChannel) {
-            return reply({
-                content: 'You need to be in a voice channel to use this command.',
+            return void reply({
+                content: 'You must be in a voice channel to use this command.',
             });
         }
 

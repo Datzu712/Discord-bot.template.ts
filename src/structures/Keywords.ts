@@ -5,8 +5,6 @@ export interface KeywordOptions {
 
     description: string | null;
 
-    usage: string | null;
-
     inputType: {
         url?: boolean;
         number?: boolean;
@@ -16,12 +14,18 @@ export interface KeywordOptions {
         role?: boolean;
         user?: boolean;
         member?: boolean;
-        guild?: boolean;
     };
     displayErrors: boolean;
+    prefix: string;
+
+    enabled: boolean;
+
+    required: boolean;
+
+    global?: boolean;
 }
 
-export class KeywordManager implements KeywordOptions {
+export class Keyword implements KeywordOptions {
     /** Keyword name. */
     public name: string;
 
@@ -31,8 +35,8 @@ export class KeywordManager implements KeywordOptions {
     /** Keyword description. */
     public description: string | null;
 
-    /** Keyword usage. */
-    public usage: string | null;
+    /** Keyword  */
+    public enabled: boolean;
 
     /** Base on the input type, we throw an error (if KeywordOptions.displayErrors is enabled). (--keyword input) */
     public inputType: {
@@ -48,34 +52,44 @@ export class KeywordManager implements KeywordOptions {
         guild?: boolean;
     };
 
-    /** If it is enabled, bot will throw an error when a input type is not fulfilled. */
-    public displayErrors = false;
+    /** If it is enabled, bot will send an error to the user when a input type is not fulfilled. */
+    public displayErrors: boolean;
     /**
      * @desc Keyword prefix. Default --
      * @example <prefix>keyword <input>
      */
-    public prefix = '--';
+    public prefix: string;
+
+    public required: boolean;
 
     /**
      * @param { KeywordOptions } options - Keyword options.
      */
-    constructor({ name, aliases, description, usage, inputType, displayErrors }: RequireAtLeastOneOf<KeywordOptions>) {
+    constructor({
+        name,
+        aliases,
+        description,
+        inputType,
+        displayErrors,
+        prefix,
+        enabled,
+        required,
+    }: RequireAtLeastOneOf<KeywordOptions>) {
         if (!name || !inputType) {
-            throw new Error(
-                `Keyword ${!name ? 'name' : 'inputType'} is required. (KeywordOptions.${!name ? 'name' : 'inputType'})`,
-            );
+            const missingArgument = !name ? 'name' : 'inputType';
+            throw new Error(`Keyword ${missingArgument} is required. (KeywordOptions.${missingArgument})`);
         }
-        if (Object.keys(inputType).length >= 0 || Object.keys(inputType).length > 1) {
-            // idk if we could accept more than one input type.
-            throw new Error(
-                `Keyword inputType must be a single type. Received ${Object.keys(inputType).length} (Expected 1)`,
-            );
+
+        if (Object.keys(inputType).length === 0) {
+            throw new Error(`Keyword inputType must be a single or more type. (Expected 1+)`);
         }
         this.name = name;
         this.aliases = aliases ?? null;
         this.description = description ?? null;
-        this.usage = usage ?? null;
         this.inputType = inputType;
         this.displayErrors = displayErrors ?? false;
+        this.prefix = prefix ?? '--';
+        this.enabled = enabled ?? true;
+        this.required = required ?? false;
     }
 }

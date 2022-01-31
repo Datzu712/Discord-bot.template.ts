@@ -19,15 +19,21 @@ export default class MessageCreate extends BaseEvent {
         // You can add multiples prefixes
         const prefixes: string[] = [
             message.guild?.prefix ?? process.env.DEFAULT_BOT_PREFIX,
-            `<@!${this.client.user?.id}> `,
+            `<@!${this.client.user?.id}> `, // TODO Fix this (I'm very bad using regex)
             `<@${this.client.user?.id}> `,
         ];
-        // If some user mentioned the bot, the bot will reply with the guild prefix.
+        // If the user mentioned the bot, he will reply to it the guild prefix.
         const regMention = new RegExp(`^<@!?${this.client.user?.id}>( |)$`);
-        if (message.content.match(regMention))
+        if (message.content.match(regMention)) {
             message
-                .reply(`Hello ${'`'}${message.author.username}${'`'}! my prefix is ${'`'}${[prefixes[0]]}${'`'}`)
+                .reply({
+                    content: `Hello ${'`'}${message.author.username}${'`'}! my prefix is in this server is ${'`'}${[
+                        prefixes[0],
+                    ]}${'`'}`,
+                    attemptReply: true,
+                })
                 .catch(() => undefined);
+        }
 
         for (const prefix of prefixes) {
             this.client.commands.handle(message, prefix);

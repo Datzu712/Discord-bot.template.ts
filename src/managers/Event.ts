@@ -20,9 +20,9 @@ class EventManager {
      * @param { Client } client - Client instance.
      * @param { boolean } debug - If debug is true, will send more details in the console about importing events.
      */
-    public constructor(public client: Client, private debug?: boolean) {}
+    public constructor(public client: Client) {}
 
-    public async importEvents(from: PathLike) {
+    public async initEvents(from: PathLike) {
         try {
             /**
              * Events files names.
@@ -30,6 +30,8 @@ class EventManager {
              */
             const files: string[] = readdirSync(from);
             if (files.length === 0) throw new Error(`Could not find events files in ${from}.`);
+
+            this.client.logger.debug(`Found ${files.length} events files in ${from}. (${files.join(', ')})`);
 
             for (const fileName of files) {
                 /*
@@ -48,12 +50,13 @@ class EventManager {
                 const event = new Event.default(this.client);
                 if (event.type === 'djs') {
                     this.client.on(event.name as keyof ClientEvents, (...args: unknown[]) => event.execute(...args));
-
-                    if (this.debug) this.client.logger.info(`Imported djs event ${event.name}`, 'EventManager');
                 } else if (event.type) {
                     // Other events
-                } else
+                } else {
                     this.client.logger.warn(`Unknown event type ${event.type} in ${from}/${fileName}`, 'EventManager');
+                }
+
+                this.client.logger.debug(`Imported ${event.name} as ${event.type} event.`, 'EventManager');
             }
             return this.client.logger.info(`Imported ${files.length} events.`, 'EventManager');
         } catch (error) {

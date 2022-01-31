@@ -1,8 +1,10 @@
 /**
  * Like function global type.
  * R = return type
+ * 
+ * A = arguments
  */
-declare type LikeFunction<R> = (...args: any[]) => R;
+declare type LikeFunction<R, A = undefined> = (args?: A) => R;
 
 /**
  * Type for function object property params.
@@ -36,9 +38,9 @@ declare namespace NodeJS {
         DISCORD_WEBHOOK_URL: string;
 
         /** Discord bot shard config. */
-        CLIENT_SHARD_CONFIG: string;
+        CLIENT_SHARDS_COUNT: string;
 
         /** Client mode. */
-        CLIENT_MODE: 'production' | 'development';
+        NODE_ENV: 'production' | 'development';
     }
 }

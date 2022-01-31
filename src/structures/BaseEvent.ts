@@ -1,5 +1,5 @@
 import Client from '../core/Client';
-import { EventsTypes, events } from '../managers/EventManager';
+import { EventsTypes, events } from '../managers/Event';
 
 export interface IEvent {
     name: events;

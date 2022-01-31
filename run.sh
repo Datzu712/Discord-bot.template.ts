@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mode=`cat .env | grep CLIENT_MODE= | sed s/CLIENT_MODE=//`
+mode=`cat .env | grep NODE_ENV= | sed s/NODE_ENV=//`
 
 echo $mode
 
