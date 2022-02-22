@@ -5,7 +5,7 @@ export default class Mongodb {
     static connect = (logger?: Logger) => {
         const before = Date.now();
         try {
-            mongoose.connect(process.env.MONGODB_URL as string, {
+            mongoose.connect(process.env.MONGODB_URL, {
                 maxPoolSize: 7,
                 autoIndex: false,
             });
