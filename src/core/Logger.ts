@@ -31,6 +31,8 @@ export default class Logger {
             timeStyle: 'medium',
             hour12: false,
         });
+
+        console.debug = this.debug.bind(this);
     }
 
     /**
@@ -109,8 +111,8 @@ export default class Logger {
 
     /**
      * Write a `log` level log.
-     * @param { string } string - Message to write.
-     * @param { string } service - Name of the service.
+     * @param { string } message - Message to write.
+     * @param { string } serviceName - Name of the service.
      */
     public log(message: string, serviceName?: string): void {
         const textLog = this.resolveTextLog({ message, level: LoggerLevel.log, serviceName });

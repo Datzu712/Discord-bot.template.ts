@@ -33,7 +33,7 @@ export class ChannelCommand extends BaseCommand {
 
     /**
      * Check permissions before executing the command.
-     * @param { Message } msg - Message object.
+     * @param { Message } message - Message object.
      * @returns { object } If the command can be executed.
      */
     public permissionsFor(message: Message): { continue: boolean; error?: string } {

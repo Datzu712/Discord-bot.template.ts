@@ -12,7 +12,6 @@ import beautify from 'js-beautify';
     usage: 'eval [code]',
     guildOnly: true,
     aliases: ['e'],
-    permissions: {},
 })
 export default class EvalCommand extends ChannelCommand {
     @devsOnly()
@@ -20,7 +19,6 @@ export default class EvalCommand extends ChannelCommand {
         const startTime = Date.now();
 
         if (!args[0]) return msg.channel.send('Please provide some code to evaluate.');
-
         const baseMessage = await msg.channel.send('Evaluating...');
 
         try {
