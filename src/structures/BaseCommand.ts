@@ -31,7 +31,7 @@ export interface IBaseCommand {
             me: PermissionString[];
 
             /** Require member voice connection. */
-            // requireMemberVoiceConnection: boolean;
+            requireMemberVoiceConnection: boolean;
 
             /** Custom command permissions for guilds. */
             experimentalCustomPermissions: boolean;

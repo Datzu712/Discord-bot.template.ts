@@ -38,7 +38,7 @@ export class ChannelCommand extends BaseCommand {
         }
 
         // Check if the command require member voice connection.
-        /*if (this.data.permissions.requireMemberVoiceConnection) {
+        if (this.data.permissions.requireMemberVoiceConnection) {
             if (!message.member?.voice?.channel) {
                 return { continue: false, error: 'You must be in a voice channel to use this command!' };
             }
@@ -54,7 +54,7 @@ export class ChannelCommand extends BaseCommand {
                     } in <#${message.member?.voice?.channel.id}>`,
                 };
             }
-        }*/
+        }
         // Check bot and member permissions in the guild.
         if (message.guild) {
             // The idea of this for is don't repeat the same code evaluating the bot and member permissions.
