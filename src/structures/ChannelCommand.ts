@@ -16,16 +16,11 @@ export class ChannelCommand extends BaseCommand {
     /**
      * Construct new command.
      * @param { client } client - Client instance.
-     * @param { object } data - Command data.
+     * @param { Required<IBaseCommand['data']> } data - Command data.
      */
     public constructor(public readonly client: Client, public data: Required<IBaseCommand['data']>) {
         super(client, data);
     }
-
-    /*public send(messageOptions: unknown): Promise<Message<boolean>> {
-        throw new Error('Method not implemented.');
-    }*/
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public execute(_: ChannelExecuteContext): Promise<Message | void> {
         throw new Error(`Method not implemented in ${this.data.name} (${__filename}).`);

@@ -27,14 +27,13 @@ export default class MessageCreate extends BaseEvent {
         if (message.content.match(regMention)) {
             message
                 .reply({
-                    content: `Hello ${'`'}${message.author.username}${'`'}! my prefix is in this server is ${'`'}${[
+                    content: `Hello ${'`'}${message.author.username}${'`'}! My prefix is in this server is ${'`'}${[
                         prefixes[0],
                     ]}${'`'}`,
                     attemptReply: true,
                 })
                 .catch(() => undefined);
         }
-
         for (const prefix of prefixes) {
             this.client.commands.handle(message, prefix);
         }

@@ -1,7 +1,5 @@
-import { WriteStream, createWriteStream } from 'fs';
-import { existsSync, mkdir } from 'fs-extra';
+import { existsSync, mkdir, createWriteStream, WriteStream } from 'fs-extra';
 import moment from 'moment';
-// import { LikeFunction } from '../typings/global';
 import { reset, cyan, red, yellow, green, magenta } from '../util/colors';
 
 export enum LoggerLevel {
@@ -36,7 +34,7 @@ export default class Logger {
     }
 
     /**
-     * Write a 'log' level log.
+     * Write a  log.
      * @param { string } message - The message to log.
      * @param { LoggerLevel } level - The level of the log.
      */

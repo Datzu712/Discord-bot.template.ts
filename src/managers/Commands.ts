@@ -82,7 +82,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                         */
                         default: { type: CommandTypes } & (new (client: Client) => ChannelCommand | SlashCommand);
                     } = await import(`${from}/${folderName}/${cmdFileName}`).catch((error: Error) => {
-                        error.stack = `Failed to import the command: ${cmdFileName}. ` + error.stack;
+                        error.stack = `Failed to import the command: ${cmdFileName}.\n` + error.stack;
 
                         this.client.logger.error(error, 'CommandManager');
                     });
@@ -129,13 +129,12 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
 
     /**
      * Handle channel and interaction commands.
-     * @param { object } context - Message or CommandInteraction.
+     * @param { (Message | CommandInteraction) } context - Message or CommandInteraction.
      * @param { string } prefix - The prefix what was used with the command.
-     * @returns { Promise } Command execution...
      */
     public async handle(context: Message | CommandInteraction, prefix: string): Promise<void> {
         try {
-            // To search slash commands, we need to add the prefix '/'. (like: /{slashCommandName})
+            // To search a slash command, we need to add the prefix '/' (like: /{slashCommandName})
             const command = this.get(
                 context instanceof CommandInteraction
                     ? `/${context.commandName}`
@@ -143,6 +142,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                 false,
             ) as BaseCommand;
 
+            // First validation is only for channel commands.
             if ((context instanceof Message && !context.content.startsWith(prefix)) || !command) return;
             //if (!command.checkPermissions(context)) return;
 
@@ -152,11 +152,9 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                     'CommandManager',
                 );
 
-            this.handler.run(command, context);
-
-            // Channel commands need arguments in the second parameter (args)...
+            this.handler.run(command, context, prefix);
         } catch (error) {
-            context.reply({ content: 'An error has ocurred. Try again later.' });
+            context.reply({ content: 'An error has ocurred. Try again later.', attemptReply: true });
 
             this.client.logger.error(error as Error, 'CommandManager');
         }

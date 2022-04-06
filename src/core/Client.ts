@@ -14,7 +14,7 @@ class Client extends djs.Client {
     public readonly commands: CommandManager;
     public readonly categories: CategoryManager;
     public readonly logger: Logger;
-    // public webhook: djs.WebhookClient;
+
     private readonly events: EventManager;
     public readonly utils: Util;
 
