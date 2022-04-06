@@ -112,7 +112,6 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                         command,
                     );
 
-                    // Debug
                     this.client.logger.debug(
                         `${Command.default.type === 'CHANNEL_COMMAND' ? 'Command' : 'Slash command'} ${
                             command.data.name
