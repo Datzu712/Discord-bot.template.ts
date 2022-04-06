@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Message, MessageEmbed } from 'discord.js';
 import { ChannelCommand, ChannelExecuteContext } from '../../structures/ChannelCommand';
 import { createCommand, OnlyForDevelopers as devsOnly } from '../../util/decorators/createCommand';
@@ -65,10 +64,10 @@ export default class EvalCommand extends ChannelCommand {
                             `${
                                 input.length <= 500
                                     ? `📥 Input ${`\`\`\`js\n${beautify(input, {
-                                        indent_size: 4,
-                                        space_in_empty_paren: true,
-                                        jslint_happy: true,
-                                    })}\n\`\`\``}`
+                                          indent_size: 4,
+                                          space_in_empty_paren: true,
+                                          jslint_happy: true,
+                                      })}\n\`\`\``}`
                                     : ''
                             }📤 **Output (${Date.now() - startTime}ms)**\n` +
                                 `\`\`\`js\n${this.client.utils.replaceBannedWords(output)}\n\`\`\``,
@@ -87,7 +86,9 @@ export default class EvalCommand extends ChannelCommand {
                 });
             }
         } catch (error) {
-            return baseMessage.edit(`(${Date.now() - startTime}ms) Error: ` + `\`\`\`js\n${(error as Error).stack}\n\`\`\``);
+            return baseMessage.edit(
+                `(${Date.now() - startTime}ms) Error: ` + `\`\`\`js\n${(error as Error).stack}\n\`\`\``,
+            );
         }
     }
 }

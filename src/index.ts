@@ -1,5 +1,3 @@
-'use strict';
-
 import Client from './core/Client';
 import dotenv from 'dotenv';
 dotenv.config();
