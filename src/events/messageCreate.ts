@@ -23,7 +23,7 @@ export default class MessageCreate extends BaseEvent {
             `<@${this.client.user?.id}> `,
         ];
         // If the user mentioned the bot, he will reply to it the guild prefix.
-        const regMention = new RegExp(`^<@!?${this.client.user?.id}>( |)$`);
+        const regMention = /^<@!?/ + (this.client.user?.id as string) + />( |)$/; //new RegExp(`^<@!?${this.client.user?.id}>( |)$`);
         if (message.content.match(regMention)) {
             message
                 .reply({

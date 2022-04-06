@@ -31,6 +31,7 @@ export default class EvalCommand extends ChannelCommand {
 
             input = input.replaceAll('--async', '');
             // this eval have the all context of the client, and it is safe if you trust in the developers what they are in the dev whitelist.
+            // eslint-disable-next-line security/detect-eval-with-expression
             let output = await eval(input);
             if (typeof output !== 'string')
                 output = util.inspect(output, { depth: 0, maxStringLength: 4000, maxArrayLength: 3000 });
