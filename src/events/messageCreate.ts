@@ -22,10 +22,11 @@ export default class MessageCreate extends BaseEvent {
             `<@!${this.client.user?.id}> `, // TODO Fix this (I'm very bad using regex)
             `<@${this.client.user?.id}> `,
         ];
-        // If the user mentioned the bot, he will reply to it the guild prefix.
+        // If the bot is mentioned, he will reply to it with the guild prefix.
+        // eslint-disable-next-line security/detect-non-literal-regexp
         const regMention = new RegExp(`^<@!?${this.client.user?.id}>( |)$`);
         if (message.content.match(regMention)) {
-            message
+            return void message
                 .reply({
                     content: `Hello ${'`'}${message.author.username}${'`'}! my prefix is in this server is ${'`'}${[
                         prefixes[0],
@@ -34,7 +35,6 @@ export default class MessageCreate extends BaseEvent {
                 })
                 .catch(() => undefined);
         }
-
         for (const prefix of prefixes) {
             this.client.commands.handle(message, prefix);
         }

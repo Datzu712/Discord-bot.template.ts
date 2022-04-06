@@ -16,16 +16,11 @@ export class ChannelCommand extends BaseCommand {
     /**
      * Construct new command.
      * @param { client } client - Client instance.
-     * @param { object } data - Command data.
+     * @param { Required<IBaseCommand['data']> } data - Command data.
      */
     public constructor(public readonly client: Client, public data: Required<IBaseCommand['data']>) {
         super(client, data);
     }
-
-    /*public send(messageOptions: unknown): Promise<Message<boolean>> {
-        throw new Error('Method not implemented.');
-    }*/
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public execute(_: ChannelExecuteContext): Promise<Message | void> {
         throw new Error(`Method not implemented in ${this.data.name} (${__filename}).`);
@@ -43,7 +38,7 @@ export class ChannelCommand extends BaseCommand {
         }
 
         // Check if the command require member voice connection.
-        /*if (this.data.permissions.requireMemberVoiceConnection) {
+        if (this.data.permissions.requireMemberVoiceConnection) {
             if (!message.member?.voice?.channel) {
                 return { continue: false, error: 'You must be in a voice channel to use this command!' };
             }
@@ -59,7 +54,7 @@ export class ChannelCommand extends BaseCommand {
                     } in <#${message.member?.voice?.channel.id}>`,
                 };
             }
-        }*/
+        }
         // Check bot and member permissions in the guild.
         if (message.guild) {
             // The idea of this for is don't repeat the same code evaluating the bot and member permissions.

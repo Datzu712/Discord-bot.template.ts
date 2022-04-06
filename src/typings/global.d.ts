@@ -4,7 +4,7 @@
  * 
  * A = arguments
  */
-declare type LikeFunction<R, A = undefined> = (args?: A) => R;
+declare type LikeFunction<R> = (...args: unknown[]) => R | void;
 
 /**
  * Type for function object property params.
