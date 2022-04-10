@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   
-  # API container configuration
+  # Bot container configuration
   bot:
     container_name: bot
     build: 
@@ -15,7 +15,6 @@ services:
       - ./logs/:/bot/logs/
     links:
       - botdb
-      #- /api/node_modules
 
   # Mongodb container configuration
   botdb:
