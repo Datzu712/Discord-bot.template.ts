@@ -14,7 +14,6 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
     /**
      * Constructor of the CategoryManager.
      * @param { Client } client - Client instance.
-     * @param { boolean } debug - If debug is true, will send more details in the console about importing commands.
      */
     public constructor(public client: Client) {
         super();
@@ -53,7 +52,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
              *  ['dev', 'general', 'fun', 'music'];
              */
             const folders = readdirSync(from);
-            if (folders.length === 0) throw new Error(`Not command folders was found in ${from}`);
+            if (folders.length === 0) throw new Error(`Not command folders found in ${from}`);
 
             this.client.logger.log(`Importing commands from folders ${folders.join(', ')}...`, 'CommandManager');
 
