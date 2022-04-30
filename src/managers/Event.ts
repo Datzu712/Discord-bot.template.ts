@@ -31,7 +31,10 @@ class EventManager {
             const files: string[] = readdirSync(from);
             if (files.length === 0) throw new Error(`Could not find events files in ${from}.`);
 
-            this.client.logger.debug(`Found ${files.length} events files in ${from}. (${files.join(', ')})`);
+            this.client.logger.debug(
+                `Found ${files.length} events files in ${from}. (${files.join(', ')})`,
+                'EventManager',
+            );
 
             for (const fileName of files) {
                 /*

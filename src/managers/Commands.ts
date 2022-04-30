@@ -121,7 +121,7 @@ class CommandManager extends Map<string, ChannelCommand | SlashCommand> {
                 this.client.logger.info(`${this.size} commands imported.`, 'CommandManager');
             }
         } catch (error) {
-            this.client.logger.error(error as Error, 'CommandManager');
+            this.client.logger.error(error, 'CommandManager');
         }
     }
 

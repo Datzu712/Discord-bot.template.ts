@@ -1,5 +1,5 @@
 import djs from 'discord.js';
-import Logger from './Logger';
+import { Logger } from './Logger';
 import CategoryManager from '../managers/Categories';
 import CommandManager from '../managers/Commands';
 import Mongodb from '../database/mongoose';
@@ -26,8 +26,11 @@ class Client extends djs.Client {
 
         const debug = process.env.NODE_ENV === 'development' ? true : false;
 
-        this.logger = new Logger(resolve(`${__dirname}/../../logs`), debug);
-        this.logger.setTextTemplate('[<dateNow>] [<level>] [<serviceName>] - <message>');
+        this.logger = new Logger({
+            folderPath: resolve(`${__dirname}/../../logs`),
+            debugAllowed: debug,
+            textTemplate: '{timestamp} - {level:5} {service:15} {message}',
+        });
 
         this.commands = new CommandManager(this);
         this.categories = new CategoryManager(this);
@@ -41,7 +44,7 @@ class Client extends djs.Client {
      * @returns
      */
     public async setup(): Promise<Client> {
-        this.logger.info('Importing commands and categories...', 'client');
+        this.logger.info('Importing commands and categories...', 'CLIENT');
         try {
             await Promise.all([
                 this.commands.importCommands(resolve(`${__dirname}/../commands`)),
@@ -50,10 +53,9 @@ class Client extends djs.Client {
                 this.events.initEvents(resolve(`${__dirname}/../events`)),
             ])
                 .then(() => this.categories.syncCommands())
-                // It's difficult that the promise be rejected.
-                .catch((err) => this.logger.error(err, 'client'));
+                .catch((err) => this.logger.error(err, 'CLIENT'));
         } catch (error) {
-            this.logger.error(error as Error, 'Client');
+            this.logger.error(error, 'CLIENT');
         }
         return this;
     }

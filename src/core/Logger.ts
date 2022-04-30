@@ -1,15 +1,10 @@
-import { WriteStream, createWriteStream } from 'fs';
+/* eslint-disable no-fallthrough */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { WriteStream, createWriteStream } from 'fs-extra';
 import { existsSync, mkdir } from 'fs-extra';
 import moment from 'moment';
 import { reset, cyan, red, yellow, green, magenta } from '../util/colors';
 import { inspect } from 'util';
-
-export interface textTemplateOptions {
-    error?: Error;
-    message?: string;
-    level: LoggerLevel;
-    serviceName?: string;
-}
 
 export enum LoggerLevel {
     info = 1,
@@ -19,71 +14,94 @@ export enum LoggerLevel {
     debug = 5,
 }
 
-export default class Logger {
-    private dateFormat: Intl.DateTimeFormat;
-    private textTemplate = `[<dateNow>] [<serviceName>] [<level>] <message>`;
-
-    public notifier!: LikeFunction<void>;
-
-    constructor(public folderLogsPath: string, public debugAllowed = false) {
-        this.dateFormat = Intl.DateTimeFormat('en', {
-            dateStyle: 'short',
-            timeStyle: 'medium',
-            hour12: false,
-        });
-    }
-
+export interface LoggerOptions {
     /**
-     * Write a 'log' level log.
-     * @param { string } message - The message to log.
-     * @param { LoggerLevel } level - The level of the log.
+     * The directory to log to.
      */
-    private write(message: string, level: LoggerLevel): void {
-        const file = this.getFileLog(level);
-        file.write(`${message}\n`);
-        file.close();
-    }
-
+    folderPath: string;
     /**
-     * Write an `error` level `log`.
-     * @param { Error } error - The Error to log.
-     * @param { string } service - Name of the service.
+     * Allow the logger to write debug logs.
      */
-    public error(error: Error | string, service?: string): void {
-        if (this.notifier) {
-            this.notifier(error);
-        }
-
-        const textLog = this.resolveTextLog({
-            message: (error as Error).stack ?? (error as string),
-            serviceName: service,
-            level: LoggerLevel.error,
-        });
-
-        console.log(`${red}${textLog}`, reset);
-        this.write(textLog, LoggerLevel.error);
-    }
-
+    debugAllowed?: boolean;
     /**
-     * Write a `warn` level log.
-     * @param { string } message - The message to log.
+     * Default logger context service.
      */
-    public warn(message: string, serviceName?: string): void {
-        const textLog = this.resolveTextLog({ message, level: LoggerLevel.warn, serviceName });
+    defaultService?: string;
+    /**
+     * Logger log template.
+     * @default '{timestamp} {service} {level} {message}'
+     */
+    textTemplate?: string;
+}
 
-        console.log(`${yellow}${textLog}`, reset);
-        this.write(textLog, LoggerLevel.warn);
-    }
+export interface CreateLogMessageOptions {
+    level: LoggerLevel;
+    service?: string;
+    message: any;
+    console?: boolean;
+}
 
+export type LogExpressions = 'timestamp' | 'level' | 'service' | 'message';
+
+export class Logger {
     /**
      * Write an `info` level log.
-     * @param { string } message - The message to log.
+     * @param { any } message - The message to log.
+     * @param { string } service - Name of the service.
      */
-    public info(message: string, serviceName?: string): void {
-        const textLog = this.resolveTextLog({ message, level: LoggerLevel.info, serviceName });
+    public info!: (message: any, service?: string) => void;
+    /**
+     * Write an `debug` level log.
+     * @param { any } message - The message to log.
+     * @param { string } service - Name of the service.
+     */
+    public debug!: (message: any, service?: string) => void;
+    /**
+     * Write an `error` level log.
+     * @param { any } error - The message to log.
+     * @param { string } service - Name of the service.
+     */
+    public error!: (error: any, service?: string) => void;
+    /**
+     * Write an `warn` level log.
+     * @param { any } message - The message to log.
+     * @param { string } service - Name of the service.
+     */
+    public warn!: (message: any, service?: string) => void;
+    /**
+     * Write an `log` level log.
+     * @param { any } message - The message to log.
+     * @param { string } service - Name of the service.
+     */
+    public log!: (message: any, service?: string) => void;
+    /**
+     * Logger configuration.
+     */
+    private config: Required<LoggerOptions>;
 
-        console.log(`${cyan}${textLog}`, reset);
-        this.write(textLog, LoggerLevel.info);
+    /**
+     * @param { LoggerOptions } options - The logger configuration.
+     */
+    constructor(options: LoggerOptions) {
+        this.config = {
+            debugAllowed: options.debugAllowed ?? false,
+            defaultService: options.defaultService ?? 'unknown',
+            folderPath: options.folderPath,
+            textTemplate: options.textTemplate ?? '{timestamp} {level} {service} {message}',
+        };
+
+        for (const log in LoggerLevel) {
+            if (!Number(log)) {
+                // Do not edit existing methods.
+                if (typeof this[log as keyof typeof LoggerLevel] === 'function') continue;
+                this[log as keyof typeof LoggerLevel] = (
+                    message: any,
+                    service: string = this.config.defaultService,
+                ) => {
+                    this.defualtLogWriter(LoggerLevel[log as keyof typeof LoggerLevel], message, service);
+                };
+            }
+        }
     }
 
     /**
@@ -91,21 +109,21 @@ export default class Logger {
      * @param { LoggerLevel } level - The level of the log.
      * @returns { WriteStream } WriteStream - The file log.
      */
-    private getFileLog(level: LoggerLevel): WriteStream {
-        if (!existsSync(this.folderLogsPath)) mkdir(this.folderLogsPath);
+    private createWritableLogStream(level: LoggerLevel): WriteStream {
+        if (!existsSync(this.config.folderPath)) mkdir(this.config.folderPath);
 
         let fileType: 'log' | 'debug' | 'error' = 'log';
-
-        // For have a better logs, we divide it in different files (Error, debug and log).
-        // Error > only errors
-        // debug > only debug
-        // log > Rest of the logs (warn, info, log, etc)
+        /*
+            We divide each logs in different files (Error, debug and log).
+            Error > only errors
+            debug > only debug
+            log > Rest of the logs (warn, info, log, etc)
+        */
         if (level === LoggerLevel.debug || level === LoggerLevel.error) {
             fileType = level === LoggerLevel.debug ? 'debug' : 'error';
         }
-
         return createWriteStream(
-            `${this.folderLogsPath}/${moment().format('l').replaceAll('/', '-')}${
+            `${this.config.folderPath}/${moment().format('YYYY/MM/DD').replaceAll('/', '-')}${
                 fileType === 'log' ? '' : `-${fileType}`
             }.log`,
             {
@@ -115,65 +133,117 @@ export default class Logger {
     }
 
     /**
-     * Write a `log` level log.
-     * @param { string } message - Message to write.
-     * @param { string } serviceName - Name of the service.
+     * Write the log.
+     * @param { string } message - The message to log.
+     * @param { LoggerLevel } level - The level of the log.
      */
-    public log(message: string, serviceName?: string): void {
-        const textLog = this.resolveTextLog({ message, level: LoggerLevel.log, serviceName });
-
-        console.log(`${green}${textLog}`, reset);
-        this.write(textLog, LoggerLevel.log);
+    private write(message: string, level: LoggerLevel): void {
+        const file = this.createWritableLogStream(level);
+        file.write(`${message}\n`);
+        file.close();
     }
 
     /**
-     * Create a text log.
-     * @param { textTemplateOptions } logOptions - Text template config options.
-     * @returns { string } string - The converted text log.
+     * Crate text log.
+     * @param { LoggerLevel } level - The level of the log.
+     * @param { any } message - The message to log.
+     * @param { string } service - The service of the log.
      */
-    private resolveTextLog(logOptions: textTemplateOptions): string {
-        return this.textTemplate
-            .replaceAll('<dateNow>', this.dateFormat.format(Date.now()))
-            .replaceAll('<serviceName>', logOptions.serviceName ?? 'unknown')
-            .replaceAll('<level>', LoggerLevel[logOptions.level]?.toUpperCase())
-            .replaceAll('<message>', `${logOptions.error?.stack ?? logOptions.message}`);
+    private defualtLogWriter(level: LoggerLevel, message: any, service: string = this.config.defaultService): void {
+        if (!this.config.debugAllowed && level === LoggerLevel.debug) return;
+
+        console.log(this.createLogMessage({ level, message: message, service, console: true }));
+        this.write(this.createLogMessage({ level, message: message, service, console: false }), level);
     }
 
     /**
-     * Set the actual text template to use it in the logs.
-     * Valid values: `[<dateNow>] [<serviceName>] [<level>] <message>`
-     * @param { string } textTemplate - The new text template.
+     * Crate text log.
+     * @param { CreateLogMessageOptions } options - The level of the log.
      */
-    public setTextTemplate(textTemplate: string): void {
-        this.textTemplate = textTemplate;
-    }
-
-    /**
-     * Write a `debug` level log.
-     * @param { ({ [key: string]: string | object }) } message - The message to log.
-     * @param { string } serviceName - Name of the service.
-     */
-    public debug(message: string | { [key: string]: string | object }, serviceName?: string): void {
-        if (this.debugAllowed) {
-            const caller = (new Error().stack as string).split('at ')[2].trim();
-            //console.log(new Error().stack);
-            if (message instanceof Object) {
-                message = inspect(message, { depth: null });
+    private createLogMessage(options: CreateLogMessageOptions): string {
+        let logMessage = this.config.textTemplate;
+        /*
+            Match expressions like <string:number> in the message.
+        */
+        const matchedExpressions = logMessage.match(/{[a-zA-Z]+([:0-9]?)+}/g) ?? [];
+        /*
+            Map of valid expressions with their space count. 
+            Map (3) {
+                'date': 5,           5 Spaces after the date
+                'level': 4,          4 Spaces after the level
+                'serviceName': NaN,  No Spaces after the serviceName
             }
-            const textLog = this.resolveTextLog({
-                message: `${message} at ${caller}`,
-                level: LoggerLevel.debug,
-                serviceName,
-            });
 
-            console.log(`${magenta}${textLog}`, reset);
-            this.write(textLog, LoggerLevel.debug);
+            The space after word is depeding on the length of the word.
+         */
+        const validExpressions: Map<LogExpressions, number> = new Map();
+
+        for (const expression of matchedExpressions) {
+            /**
+             * Match the expression and get the word and the space count.
+             * EJ:
+             * ["{timestamp:1}", 5];
+             *       0           1
+             *  expression    spaceCount
+             */
+            const evaluatedExpression = /{[a-zA-Z]+([:0-9]?)+}/g.exec(expression);
+            if (!evaluatedExpression) continue;
+            // Set the values in the map.
+            validExpressions.set(
+                evaluatedExpression.input.replace(/{|}|:|[:0-9]/g, '') as LogExpressions,
+                parseInt(evaluatedExpression.input.replace(/\D/g, '')),
+            );
         }
-    }
+        for (const [expression, spaceCount] of validExpressions) {
+            let replacedString = '';
+            let color = '';
 
-    /**
-     * Set the notifier function to use it in the error logs.
-     * @param { notifier } notifier - The notifier function.
-     */
-    public setNotifier = (notifier: LikeFunction<void>) => (this.notifier = notifier);
+            if (expression === 'timestamp') {
+                replacedString = moment().format('YYYY/MM/DD LT');
+                color = green;
+            } else if (expression === 'level') {
+                replacedString = LoggerLevel[options.level]?.toUpperCase();
+                color =
+                    options.level === LoggerLevel.error
+                        ? red
+                        : options.level === LoggerLevel.warn
+                        ? yellow
+                        : options.level === LoggerLevel.debug
+                        ? magenta
+                        : options.level === LoggerLevel.info
+                        ? green
+                        : cyan;
+            } else if (expression === 'service') {
+                // If the service is not defined, use the default service.
+                replacedString = options.service ?? this.config.defaultService;
+                color = red;
+            } else if (expression === 'message') {
+                // If the message is not a string, we try to inspect it (convert into a object).
+                replacedString =
+                    typeof options.message === 'string'
+                        ? options.message
+                        : inspect(options.message, { colors: options.console ?? false, depth: null });
+            }
+            /**
+             * Calculate the spaces to add to the string.
+             * The idea is substract the spaceCount from the length of the replacedString
+             * and if it is 0 or less, it will be 0.
+             * EJ:
+             *  replacedString = 'log';
+             *  spaceCount = 5;
+             *
+             *  (3 means the length of the replacedString)
+             *             5       -          3                 = 2
+             *  spaces = spaceCount - replacedString.length; // = 2
+             *
+             * 2 spaces will be added to the string.
+             */
+            const spaces = spaceCount - replacedString.length <= 0 ? 0 : spaceCount - replacedString.length;
+            logMessage = logMessage.replace(
+                spaceCount ? `{${expression}:${spaceCount}}` : `{${expression}}`,
+                `${options.console ? `${color}${replacedString}${reset}` : replacedString}${' '.repeat(spaces ?? 0)}`,
+            );
+        }
+        return logMessage;
+    }
 }
