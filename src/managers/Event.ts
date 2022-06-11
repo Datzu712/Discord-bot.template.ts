@@ -18,7 +18,6 @@ class EventManager {
     /**
      * Constructor of the CategoryManager.
      * @param { Client } client - Client instance.
-     * @param { boolean } debug - If debug is true, will send more details in the console about importing events.
      */
     public constructor(public client: Client) {}
 
@@ -63,7 +62,7 @@ class EventManager {
             }
             return this.client.logger.info(`Imported ${files.length} events.`, 'EventManager');
         } catch (error) {
-            this.client.logger.error(error as Error, 'EventManager');
+            this.client.logger.error(error, 'EventManager');
         }
     }
 }

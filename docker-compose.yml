@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  
   # Bot container configuration
   bot:
     container_name: bot
@@ -10,9 +9,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped # restart if it is stopped
     volumes:
-      - ./src/:/bot/src/
-      - ./.env:/bot/.env
-      - ./logs/:/bot/logs/
+      - ./:/bot/
     links:
       - botdb
 

@@ -9,7 +9,6 @@ import beautify from 'js-beautify';
     description: 'Evaluates code.',
     category: 'test',
     usage: 'eval [code]',
-    guildOnly: true,
     aliases: ['e'],
 })
 export default class EvalCommand extends ChannelCommand {

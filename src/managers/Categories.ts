@@ -14,7 +14,6 @@ class CategoryManager extends Map<string, ICategory> {
     /**
      * Constructor of the CategoryManager.
      * @param { Client } client - Client instance.
-     * @param { boolean } debug - If debug is true, will send more details in the console about importing categories.
      */
     constructor(public client: Client) {
         super();

@@ -34,7 +34,7 @@ export interface IBaseCommand {
             requireMemberVoiceConnection: boolean;
 
             /** Custom command permissions for guilds. */
-            experimentalCustomPermissions: boolean;
+            customPermissions: boolean;
         };
         /** If the command is only for developers. Better use `OnlyForDevelopers` decorator.*/
         //devOnly?: boolean;

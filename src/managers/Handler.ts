@@ -35,7 +35,7 @@ export default class CommandHandler {
                 .reply({ content: 'An error has ocurred. Try again later.', attemptReply: true })
                 .catch(() => undefined);
 
-            this.client.logger.error(error as Error, 'CommandManager');
+            this.client.logger.error(error, 'CommandManager');
         }
     }
 }

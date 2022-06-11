@@ -20,7 +20,7 @@ export function createCommand(data: DeepPartial<IBaseCommand['data']>): any {
         member: data?.permissions?.member ?? [],
         me: data?.permissions?.me ?? [],
         //requireMemberVoiceConnection: data?.permissions?.requireMemberVoiceConnection ?? false,
-        experimentalCustomPermissions: data?.permissions?.experimentalCustomPermissions ?? false,
+        customPermissions: data?.permissions?.customPermissions ?? false,
     };
 
     if (!data.aliases) data.aliases = [];
