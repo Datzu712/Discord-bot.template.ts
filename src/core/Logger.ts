@@ -1,7 +1,4 @@
-/* eslint-disable no-fallthrough */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { WriteStream, createWriteStream } from 'fs-extra';
-import { existsSync, mkdir } from 'fs-extra';
+import { existsSync, mkdirSync, WriteStream, createWriteStream } from 'fs';
 import moment from 'moment';
 import { reset, cyan, red, yellow, green, magenta } from '../util/colors';
 import { inspect } from 'util';
@@ -13,6 +10,9 @@ export enum LoggerLevel {
     log = 4,
     debug = 5,
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type logMessage = any;
 
 export interface LoggerOptions {
     /**
@@ -37,7 +37,7 @@ export interface LoggerOptions {
 export interface CreateLogMessageOptions {
     level: LoggerLevel;
     service?: string;
-    message: any;
+    message: logMessage;
     console?: boolean;
 }
 
@@ -46,34 +46,34 @@ export type LogExpressions = 'timestamp' | 'level' | 'service' | 'message';
 export class Logger {
     /**
      * Write an `info` level log.
-     * @param { any } message - The message to log.
+     * @param { logMessage } message - The message to log.
      * @param { string } service - Name of the service.
      */
-    public info!: (message: any, service?: string) => void;
+    public info!: (message: logMessage, service?: string) => void;
     /**
      * Write an `debug` level log.
-     * @param { any } message - The message to log.
+     * @param { logMessage } message - The message to log.
      * @param { string } service - Name of the service.
      */
-    public debug!: (message: any, service?: string) => void;
+    public debug!: (message: logMessage, service?: string) => void;
     /**
      * Write an `error` level log.
-     * @param { any } error - The message to log.
+     * @param { logMessage } error - The message to log.
      * @param { string } service - Name of the service.
      */
-    public error!: (error: any, service?: string) => void;
+    public error!: (error: logMessage, service?: string) => void;
     /**
      * Write an `warn` level log.
-     * @param { any } message - The message to log.
+     * @param { logMessage } message - The message to log.
      * @param { string } service - Name of the service.
      */
-    public warn!: (message: any, service?: string) => void;
+    public warn!: (message: logMessage, service?: string) => void;
     /**
      * Write an `log` level log.
-     * @param { any } message - The message to log.
+     * @param { logMessage } message - The message to log.
      * @param { string } service - Name of the service.
      */
-    public log!: (message: any, service?: string) => void;
+    public log!: (message: logMessage, service?: string) => void;
     /**
      * Logger configuration.
      */
@@ -95,13 +95,14 @@ export class Logger {
                 // Do not edit existing methods.
                 if (typeof this[log as keyof typeof LoggerLevel] === 'function') continue;
                 this[log as keyof typeof LoggerLevel] = (
-                    message: any,
+                    message: logMessage,
                     service: string = this.config.defaultService,
                 ) => {
                     this.defualtLogWriter(LoggerLevel[log as keyof typeof LoggerLevel], message, service);
                 };
             }
         }
+        console.debug = this.debug.bind(this);
     }
 
     /**
@@ -110,7 +111,7 @@ export class Logger {
      * @returns { WriteStream } WriteStream - The file log.
      */
     private createWritableLogStream(level: LoggerLevel): WriteStream {
-        if (!existsSync(this.config.folderPath)) mkdir(this.config.folderPath);
+        if (!existsSync(this.config.folderPath)) mkdirSync(this.config.folderPath);
 
         let fileType: 'log' | 'debug' | 'error' = 'log';
         /*
@@ -149,7 +150,11 @@ export class Logger {
      * @param { any } message - The message to log.
      * @param { string } service - The service of the log.
      */
-    private defualtLogWriter(level: LoggerLevel, message: any, service: string = this.config.defaultService): void {
+    private defualtLogWriter(
+        level: LoggerLevel,
+        message: logMessage,
+        service: string = this.config.defaultService,
+    ): void {
         if (!this.config.debugAllowed && level === LoggerLevel.debug) return;
 
         console.log(this.createLogMessage({ level, message: message, service, console: true }));
@@ -165,13 +170,14 @@ export class Logger {
         /*
             Match expressions like <string:number> in the message.
         */
+        // eslint-disable-next-line security/detect-unsafe-regex
         const matchedExpressions = logMessage.match(/{[a-zA-Z]+([:0-9]?)+}/g) ?? [];
         /*
             Map of valid expressions with their space count. 
-            Map (3) {
-                'date': 5,           5 Spaces after the date
+            validExpressions (3) {
+                'timestamp': 5,           5 Spaces after the date
                 'level': 4,          4 Spaces after the level
-                'serviceName': NaN,  No Spaces after the serviceName
+                'service': NaN,  No Spaces after the serviceName
             }
 
             The space after word is depeding on the length of the word.
@@ -186,6 +192,7 @@ export class Logger {
              *       0           1
              *  expression    spaceCount
              */
+            // eslint-disable-next-line security/detect-unsafe-regex
             const evaluatedExpression = /{[a-zA-Z]+([:0-9]?)+}/g.exec(expression);
             if (!evaluatedExpression) continue;
             // Set the values in the map.
@@ -218,7 +225,7 @@ export class Logger {
                 replacedString = options.service ?? this.config.defaultService;
                 color = red;
             } else if (expression === 'message') {
-                // If the message is not a string, we try to inspect it (convert into a object).
+                // If the message is not a string, we try to inspect it (convert into a object string).
                 replacedString =
                     typeof options.message === 'string'
                         ? options.message
