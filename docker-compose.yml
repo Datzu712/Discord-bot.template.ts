@@ -10,7 +10,7 @@ services:
     restart: unless-stopped # restart if it is stopped
     volumes:
       - ./:/bot/
-    links:
+    depends_on:
       - botdb
 
   # Mongodb container configuration
