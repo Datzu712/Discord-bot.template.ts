@@ -1,4 +1,4 @@
-FROM node:16.13.0
+FROM node:16.15.1-alpine
 
 WORKDIR /bot
 
@@ -8,4 +8,4 @@ RUN npm install
 
 COPY . .
 
-CMD [ "./run.sh" ]
+CMD [ "npm", "run", "build:start" ]

@@ -111,3 +111,7 @@ storage/*
 yarn.lock
 
 storage
+
+.idea
+
+.storage

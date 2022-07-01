@@ -2,32 +2,31 @@ version: '3.8'
 
 services:
   
-  # API container configuration
+  # Client container configuration
   bot:
-    container_name: bot
-    build: 
+    env_file:
+      - ./.env
+    build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: "Dockerfile.${NODE_ENV}"
     restart: unless-stopped # restart if it is stopped
     volumes:
-      - ./src/:/bot/src/
-      - ./.env:/bot/.env
-      - ./logs/:/bot/logs/
-    links:
-      - botdb
-      #- /api/node_modules
+      - ./:/bot/
+    depends_on:
+      - mongodb
 
   # Mongodb container configuration
-  botdb:
-    image: mongo:5.0
+  mongodb:
+    env_file:
+        - ./.env
+    image: mongo:latest
     container_name: botdb
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=root
-      - MONGO_INITDB_DATABASE=botdb
+      - "MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}"
+      - "MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}"
+      - "MONGO_INITDB_DATABASE=${MONGO_DATABASE}"
     ports:
-      - 27027:27017
-    expose:
-      - 27017
-    #volumes:
-      #- ./storage:/data/db
+      - "${MONGO_PORT}:${MONGO_PORT}"
+    volumes:
+       - "${MONGO_BACKUP_DIR}:/data/db"
+    
