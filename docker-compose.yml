@@ -16,17 +16,16 @@ services:
       - mongodb
 
   # Mongodb container configuration
-  mongodb:
+  # Mongodb container configuration
+  botdb:
+    image: mongo:5.0
     env_file:
-        - ./.env
-    image: mongo:latest
+      - ./.env
     container_name: botdb
     environment:
       - "MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}"
       - "MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}"
-      - "MONGO_INITDB_DATABASE=${MONGO_DATABASE}"
+      - "MONGO_INITDB_DATABASE=${MONGO_DATABASE-discord-bot}"
     ports:
       - "${MONGO_PORT}:${MONGO_PORT}"
-    volumes:
-       - "${MONGO_BACKUP_DIR}:/data/db"
     

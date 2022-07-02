@@ -24,10 +24,6 @@ export interface LoggerOptions {
      */
     debugAllowed?: boolean;
     /**
-     * Default logger context service.
-     */
-    defaultService?: string;
-    /**
      * Logger log template.
      * @default '{timestamp} {service} {level} {message}'
      */
@@ -36,7 +32,7 @@ export interface LoggerOptions {
 
 export interface CreateLogMessageOptions {
     level: LoggerLevel;
-    service?: string;
+    service: string;
     message: logMessage;
     console?: boolean;
 }
@@ -85,7 +81,6 @@ export class Logger {
     constructor(options: LoggerOptions) {
         this.config = {
             debugAllowed: options.debugAllowed ?? false,
-            defaultService: options.defaultService ?? 'unknown',
             folderPath: options.folderPath,
             textTemplate: options.textTemplate ?? '{timestamp} {level} {service} {message}',
         };
@@ -94,11 +89,8 @@ export class Logger {
             if (!Number(log)) {
                 // Do not edit existing methods.
                 if (typeof this[log as keyof typeof LoggerLevel] === 'function') continue;
-                this[log as keyof typeof LoggerLevel] = (
-                    message: logMessage,
-                    service: string = this.config.defaultService,
-                ) => {
-                    this.defualtLogWriter(LoggerLevel[log as keyof typeof LoggerLevel], message, service);
+                this[log as keyof typeof LoggerLevel] = (message: logMessage, service?: string) => {
+                    this.defualtLogWriter(LoggerLevel[log as keyof typeof LoggerLevel], message, service ?? 'unknown');
                 };
             }
         }
@@ -150,11 +142,7 @@ export class Logger {
      * @param { any } message - The message to log.
      * @param { string } service - The service of the log.
      */
-    private defualtLogWriter(
-        level: LoggerLevel,
-        message: logMessage,
-        service: string = this.config.defaultService,
-    ): void {
+    private defualtLogWriter(level: LoggerLevel, message: logMessage, service: string): void {
         if (!this.config.debugAllowed && level === LoggerLevel.debug) return;
 
         console.log(this.createLogMessage({ level, message: message, service, console: true }));
@@ -222,7 +210,7 @@ export class Logger {
                         : cyan;
             } else if (expression === 'service') {
                 // If the service is not defined, use the default service.
-                replacedString = options.service ?? arguments.callee.name;
+                replacedString = options.service;
                 color = red;
             } else if (expression === 'message') {
                 // If the message is not a string, we try to inspect it (convert into a object string).
