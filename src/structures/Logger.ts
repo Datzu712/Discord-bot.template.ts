@@ -1,7 +1,8 @@
-import { existsSync, mkdirSync, WriteStream, createWriteStream } from 'fs';
 import moment from 'moment';
-import { reset, cyan, red, yellow, green, magenta } from '../util/colors';
 import { inspect } from 'util';
+import { existsSync, mkdirSync, WriteStream, createWriteStream } from 'fs';
+
+import { reset, cyan, red, yellow, green, magenta } from '../util/colors';
 
 export enum LoggerLevel {
     info = 1,
