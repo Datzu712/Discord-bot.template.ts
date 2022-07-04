@@ -1,9 +1,12 @@
 import type Client from './Client';
+import { Base } from './Base';
 
 export type eventTarget = 'database' | 'client';
 
-export class BaseEvent {
-    constructor(public client: Client, public config: { name: string; target: eventTarget }) {}
+export class BaseEvent extends Base {
+    constructor(public client: Client, public config: { name: string; target: eventTarget }) {
+        super();
+    }
 
     /**
      * Method to execute the event

@@ -1,5 +1,5 @@
 import type Client from '../structures/Client';
-import BaseManager from '../structures/BaseManager';
+import BaseManager from './BaseManager';
 import { BaseEvent } from '../structures/BaseEvent';
 import { Logger } from '../structures/Logger';
 
@@ -27,6 +27,8 @@ export default class EventManager extends BaseManager {
              * Inside the decorator, we return an Proxy object that will be used to create the event instance.
              */
             const event = new eventClass(this.client);
+            // Create a specific logger for the event
+            event.setLogger(this.client.logger.createContextLogger(event.config.name));
             // Check if the event has all required properties
             if (!event.execute || !event.config?.name || !event.config?.target) {
                 throw new Error(
