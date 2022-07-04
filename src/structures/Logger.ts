@@ -21,13 +21,19 @@ export interface LoggerOptions {
     folderPath: string;
     /**
      * Allow the logger to write debug logs.
+     * @default false
      */
-    debugAllowed?: boolean;
+    debugAllowed: boolean;
     /**
      * Logger log template.
      * @default '{timestamp} {service} {level} {message}'
      */
-    textTemplate?: string;
+    textTemplate: string;
+    /**
+     * Default service to log.
+     * When it is enabled, when you call some method of the logger, it will log the service name by default with the defined value of defaultService.
+     */
+    defaultService?: string | null;
 }
 
 export interface CreateLogMessageOptions {
@@ -78,11 +84,19 @@ export class Logger {
     /**
      * @param { LoggerOptions } options - The logger configuration.
      */
-    constructor(options: LoggerOptions) {
+    constructor({
+        debugAllowed = false,
+        folderPath,
+        textTemplate = '{timestamp} {level} {service} {message}',
+        defaultService = null,
+    }: LoggerOptions) {
+        if (!folderPath) throw new Error('Missing folderPath');
+
         this.config = {
-            debugAllowed: options.debugAllowed ?? false,
-            folderPath: options.folderPath,
-            textTemplate: options.textTemplate ?? '{timestamp} {level} {service} {message}',
+            debugAllowed: debugAllowed,
+            folderPath: folderPath,
+            textTemplate: textTemplate,
+            defaultService: defaultService,
         };
 
         for (const log in LoggerLevel) {
@@ -90,7 +104,11 @@ export class Logger {
                 // Do not edit existing methods.
                 if (typeof this[log as keyof typeof LoggerLevel] === 'function') continue;
                 this[log as keyof typeof LoggerLevel] = (message: logMessage, service?: string) => {
-                    this.defualtLogWriter(LoggerLevel[log as keyof typeof LoggerLevel], message, service ?? 'unknown');
+                    this.defaultLogWriter(
+                        LoggerLevel[log as keyof typeof LoggerLevel],
+                        message,
+                        this.config.defaultService ?? service ?? 'unknown',
+                    );
                 };
             }
         }
@@ -142,7 +160,7 @@ export class Logger {
      * @param { any } message - The message to log.
      * @param { string } service - The service of the log.
      */
-    private defualtLogWriter(level: LoggerLevel, message: logMessage, service: string): void {
+    private defaultLogWriter(level: LoggerLevel, message: logMessage, service: string): void {
         if (!this.config.debugAllowed && level === LoggerLevel.debug) return;
 
         console.log(this.createLogMessage({ level, message: message, service, console: true }));
@@ -240,5 +258,15 @@ export class Logger {
             );
         }
         return logMessage;
+    }
+
+    /**
+     * Create a new instance of this class with this configuration but with an defaultService.
+     * When defaultService is defined, the argument "service" of all methods of this class will be replaced with defaultService.
+     * @param { string } service - The default service.
+     * @returns { Logger } The new instance of this class with defaultService defined.
+     */
+    public createContextLogger(service: string): Logger {
+        return new Logger({ ...this.config, defaultService: service });
     }
 }
