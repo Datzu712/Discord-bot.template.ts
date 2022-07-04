@@ -15,7 +15,7 @@ export abstract class Base {
 
     /**
      * Set the logger of the class.
-     * @param { Logger } logger - Logger instance.
+     * @param { logger } logger - Logger instance.
      */
     public setLogger(logger: logger): void {
         this.logger = logger;

@@ -1,18 +1,22 @@
 import type Client from '../structures/Client';
 import BaseManager from './BaseManager';
 import { BaseEvent } from '../structures/BaseEvent';
-import { Logger } from '../structures/Logger';
 
 export default class EventManager extends BaseManager {
-    #logger: Logger;
     constructor(client: Client) {
         super(client);
-        this.#logger = client.logger.createContextLogger('EventManager');
+
+        this.setLogger(client.logger.createContextLogger('EventManager'));
     }
+
+    /**
+     * Import and init all events from a given path.
+     * @param { string } from - Path to the directory to import all events.
+     */
     public async initEvents(from: string): Promise<void> {
-        this.#logger.info(`Importing events from ${from}`);
+        this.logger.info(`Importing events from ${from}`);
         const files = await this.importAllFilesFromPath<new (client: Client) => BaseEvent>(from, true);
-        this.#logger.debug(`Detected ${files.length} events`);
+        this.logger.debug(`Detected ${files.length} events`);
 
         for (const file of [...files]) {
             // Check if the file's content is an constructor of BaseEvent
@@ -37,16 +41,15 @@ export default class EventManager extends BaseManager {
                     }.`,
                 );
             }
-            this.#logger.debug(`Registering event ${event.config.name} from ${event.config.target}`);
-
+            this.logger.debug(`Registering ${event.config.name} in ${event.config.target}`);
             // Listen to the event depending on the target
             if (event.config.target === 'client') {
                 this.client.on(event.config.name, event.execute.bind(event));
             } else {
-                this.#logger.error(`Unknown target ${event.config.target} for event ${event.config.name}`);
+                this.logger.error(`Unknown target ${event.config.target} for event ${event.config.name}`);
                 files.splice(files.indexOf(file), 1);
             }
         }
-        this.#logger.info(`Successfully imported ${files.length} events`);
+        this.logger.info(`Successfully imported ${files.length} events`);
     }
 }

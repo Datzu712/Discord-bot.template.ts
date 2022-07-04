@@ -186,7 +186,7 @@ export class Logger {
                 'service': NaN,  No Spaces after the serviceName
             }
 
-            The space after word is depeding on the length of the word.
+            The space after word is depending on the length of the word.
          */
         const validExpressions: Map<LogExpressions, number> = new Map();
 
@@ -239,7 +239,7 @@ export class Logger {
             }
             /**
              * Calculate the spaces to add to the string.
-             * The idea is substract the spaceCount from the length of the replacedString
+             * The idea is subtract the spaceCount from the length of the replacedString
              * and if it is 0 or less, it will be 0.
              * EJ:
              *  replacedString = 'log';

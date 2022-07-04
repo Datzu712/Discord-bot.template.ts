@@ -2,7 +2,7 @@ import { Client as djsClient, type ClientOptions } from 'discord.js';
 import { resolve } from 'path';
 
 import { Logger } from './Logger';
-import DatabaseConnection from '../database/db';
+import DatabaseConnection from '../database/Database';
 import { clientToken } from '../config/config';
 import EventManager from '../managers/EventManager';
 
