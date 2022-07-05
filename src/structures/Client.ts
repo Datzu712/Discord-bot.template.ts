@@ -5,10 +5,16 @@ import { Logger } from '../structures/Logger';
 import DatabaseConnection from '../database/Database';
 import { clientToken } from '../config/config';
 import EventManager from '../managers/EventManager';
+import CommandManager from '../managers/CommandManager';
+import Util from '../utils/Util';
 
 export default class Client extends djsClient {
     public readonly logger: Logger;
+    public readonly utils: Util;
+
+    // managers
     public readonly events: EventManager;
+    public readonly commands: CommandManager;
 
     constructor(options: ClientOptions) {
         super(options);
@@ -21,6 +27,9 @@ export default class Client extends djsClient {
         });
 
         this.events = new EventManager(this);
+        this.commands = new CommandManager(this);
+
+        this.utils = new Util(this);
     }
 
     /**
@@ -39,6 +48,7 @@ export default class Client extends djsClient {
      * @returns { Promise<client> }
      */
     public async setup(): Promise<Client> {
+        await this.commands.importCommands(resolve(__dirname, '../commands'));
         await this.events.initEvents(resolve(__dirname, '../events'));
 
         return this;

@@ -27,12 +27,15 @@
   "dependencies": {
     "discord.js": "^13.8.1",
     "dotenv": "^16.0.1",
+    "js-beautify": "^1.14.4",
     "moment": "^2.29.3",
     "mongodb": "^4.7.0",
-    "mongoose": "^6.4.2"
+    "mongoose": "^6.4.2",
+    "sourcebin": "^4.3.5"
   },
   "devDependencies": {
     "@sentry/node": "^7.4.1",
+    "@types/js-beautify": "^1.13.3",
     "@typescript-eslint/eslint-plugin": "^5.30.3",
     "@typescript-eslint/parser": "^5.30.3",
     "eslint": "^8.18.0",

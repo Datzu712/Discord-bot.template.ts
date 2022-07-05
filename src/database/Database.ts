@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
 
 import { type Logger } from '../structures/Logger';
-import { mongoConfig } from '../config/config';
+import { mongoURI } from '../config/config';
 
 export default class Database {
     static async connect(logger?: Logger): Promise<void> {
         const before = Date.now();
 
-        await mongoose.connect(mongoConfig.uri, {
+        await mongoose.connect(mongoURI, {
             maxPoolSize: 7,
             autoIndex: false,
         });
@@ -15,6 +15,6 @@ export default class Database {
         const ping: number = await new Promise((resolve) => {
             mongoose.connection.db.admin().ping(() => resolve(Date.now() - before));
         });
-        logger?.info(`Connected to MongoDb with ${ping}ms`, 'Database');
+        logger?.info(`Connected to MongoDB with ${ping}ms`, 'Database');
     }
 }

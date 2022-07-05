@@ -1,12 +1,12 @@
 import { existsSync, readdirSync, lstatSync } from 'fs';
 import { resolve } from 'path';
 
-import type Client from '../structures/Client';
-import { Base } from '../structures/Base';
+import { type basicLogger } from '../structures/Logger';
 
-export default class BaseManager extends Base {
-    constructor(public client: Client) {
-        super(client.logger.createContextLogger('BaseManager'));
+export default class BaseManager<K, V> extends Map<K, V> {
+    protected logger: basicLogger = console;
+    constructor() {
+        super();
     }
 
     /**
@@ -15,7 +15,7 @@ export default class BaseManager extends Base {
      * @param { boolean } ignoreErrors - If true, will ignore errors and continue importing files.
      * @returns { Promise<{ path: string; content: object }[]> }
      */
-    public async importAllFilesFromPath<T extends object>(
+    protected async importAllFilesFromPath<T extends object>(
         dir: string,
         ignoreErrors?: boolean,
     ): Promise<{ path: string; content: T }[]> {
@@ -45,5 +45,9 @@ export default class BaseManager extends Base {
             }
         }
         return files;
+    }
+
+    public setLogger(logger: basicLogger): void {
+        this.logger = logger;
     }
 }

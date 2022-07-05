@@ -2,23 +2,22 @@ import type Client from '../structures/Client';
 import BaseManager from './BaseManager';
 import { BaseEvent } from '../structures/BaseEvent';
 
-export default class EventManager extends BaseManager {
-    constructor(client: Client) {
-        super(client);
+export default class EventManager extends BaseManager<string, BaseEvent> {
+    constructor(private client: Client) {
+        super();
 
         this.setLogger(client.logger.createContextLogger('EventManager'));
     }
 
     /**
      * Import and init all events from a given path.
-     * @param { string } from - Path to the directory to import all events.
+     * @param { string } path - Path to the directory to import all events.
      */
-    public async initEvents(from: string): Promise<void> {
-        this.logger.info(`Importing events from ${from}`);
-        const files = await this.importAllFilesFromPath<new (client: Client) => BaseEvent>(from, true);
-        this.logger.debug(`Detected ${files.length} events`);
+    public async initEvents(path: string): Promise<void> {
+        const files = await this.importAllFilesFromPath<new (client: Client) => BaseEvent>(path, true);
+        this.logger.info(`Importing events from ${path} (Detected ${files.length} events)`);
 
-        for (const file of [...files]) {
+        for (const file of files) {
             // Check if the file's content is an constructor of BaseEvent
             if (!file.content?.constructor || !(file.content.prototype instanceof BaseEvent)) {
                 throw new Error(
@@ -41,15 +40,20 @@ export default class EventManager extends BaseManager {
                     }.`,
                 );
             }
-            this.logger.debug(`Registering ${event.config.name} in ${event.config.target}`);
+            this.logger.debug(
+                `Registering {c:yellow}${event.config.name}{c:reset} in {c:yellow}${event.config.target}{c:reset} from {c:blue}${file.path}{c:reset}`,
+            );
             // Listen to the event depending on the target
             if (event.config.target === 'client') {
                 this.client.on(event.config.name, event.execute.bind(event));
+
+                this.set(event.config.name, event);
             } else {
-                this.logger.error(`Unknown target ${event.config.target} for event ${event.config.name}`);
-                files.splice(files.indexOf(file), 1);
+                this.logger.error(
+                    `Unknown target {c:red}${event.config.target}{c:reset} for event {c:red}${event.config.name}{c:reset}`,
+                );
             }
         }
-        this.logger.info(`Successfully imported ${files.length} events`);
+        this.logger.info(`{c:green}Successfully imported ${this.size} events{c:reset}`);
     }
 }

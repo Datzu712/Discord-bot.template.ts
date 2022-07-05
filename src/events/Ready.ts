@@ -1,4 +1,4 @@
-import createEvent from '../util/decorators/createEvent';
+import createEvent from '../utils/decorators/createEvent';
 import { BaseEvent } from '../structures/BaseEvent';
 
 @createEvent({ name: 'ready', target: 'client' })
@@ -15,6 +15,6 @@ export default class Ready extends BaseEvent {
             status: 'online',
         });
 
-        this.logger.info(`Connected to ${this.client.user?.tag}!`);
+        this.logger.info(`Connected to {c:blue}${this.client.user?.tag}{c:reset}!`);
     }
 }

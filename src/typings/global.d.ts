@@ -34,3 +34,5 @@ declare namespace NodeJS {
         MONGO_URI: string;
     }
 }
+
+declare type MakeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

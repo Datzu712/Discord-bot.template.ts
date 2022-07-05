@@ -1,9 +1,9 @@
 import type Client from './Client';
-import { Base } from './Base';
+import Base from './Base';
 
 export type eventTarget = 'database' | 'client';
 
-export class BaseEvent extends Base {
+export abstract class BaseEvent extends Base {
     constructor(public client: Client, public config: { name: string; target: eventTarget }) {
         super();
     }
@@ -12,8 +12,5 @@ export class BaseEvent extends Base {
      * Method to execute the event
      * @param { unknown[] } args - Arguments of the event
      **/
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    execute(...args: unknown[]) {
-        throw new Error('Method not implemented.');
-    }
+    abstract execute(...args: unknown[]): void;
 }

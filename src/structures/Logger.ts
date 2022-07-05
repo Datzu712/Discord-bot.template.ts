@@ -2,7 +2,7 @@ import moment from 'moment';
 import { inspect } from 'util';
 import { existsSync, mkdirSync, WriteStream, createWriteStream } from 'fs';
 
-import { reset, cyan, red, yellow, green, magenta } from '../util/colors';
+import * as colors from '../utils/colors';
 
 export enum LoggerLevel {
     info = 1,
@@ -14,6 +14,14 @@ export enum LoggerLevel {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type logMessage = any;
+
+export interface basicLogger {
+    info: (message: logMessage) => void;
+    debug: (message: logMessage) => void;
+    error: (message: logMessage) => void;
+    warn: (message: logMessage) => void;
+    log: (message: logMessage) => void;
+}
 
 export interface LoggerOptions {
     /**
@@ -81,7 +89,12 @@ export class Logger {
      * Logger configuration.
      */
     private config: Required<LoggerOptions>;
-
+    /**
+     * Regexp colors regexp.
+     * To replace the colors in the log template.
+     */
+    // eslint-disable-next-line security/detect-non-literal-regexp
+    private colorsRegexp = /{c:[a-z]*}/g;
     /**
      * @param { LoggerOptions } options - The logger configuration.
      */
@@ -113,7 +126,6 @@ export class Logger {
                 };
             }
         }
-        console.debug = this.debug.bind(this);
     }
 
     /**
@@ -214,29 +226,43 @@ export class Logger {
 
             if (expression === 'timestamp') {
                 replacedString = moment().format('YYYY/MM/DD LT');
-                color = green;
+                color = colors.green;
             } else if (expression === 'level') {
                 replacedString = LoggerLevel[options.level]?.toUpperCase();
                 color =
                     options.level === LoggerLevel.error
-                        ? red
+                        ? colors.red
                         : options.level === LoggerLevel.warn
-                        ? yellow
+                        ? colors.yellow
                         : options.level === LoggerLevel.debug
-                        ? magenta
+                        ? colors.magenta
                         : options.level === LoggerLevel.info
-                        ? green
-                        : cyan;
+                        ? colors.green
+                        : colors.cyan;
             } else if (expression === 'service') {
                 // If the service is not defined, use the default service.
                 replacedString = options.service;
-                color = red;
+                color = colors.red;
             } else if (expression === 'message') {
                 // If the message is not a string, we try to inspect it (convert into a object string).
                 replacedString =
                     typeof options.message === 'string'
                         ? options.message
                         : inspect(options.message, { colors: options.console ?? false, depth: null });
+
+                if (this.colorsRegexp.test(replacedString)) {
+                    const matches = replacedString.match(this.colorsRegexp) as RegExpMatchArray;
+                    for (const match of matches) {
+                        const targetColor = match.replace('{c:', '').replace('}', '');
+                        if (!colors[targetColor as keyof typeof colors]) continue;
+                        options.console
+                            ? (replacedString = replacedString.replace(
+                                  match,
+                                  colors[targetColor as keyof typeof colors],
+                              ))
+                            : (replacedString = replacedString.replace(match, ''));
+                    }
+                }
             }
             /**
              * Calculate the spaces to add to the string.
@@ -255,7 +281,9 @@ export class Logger {
             const spaces = spaceCount - replacedString.length <= 0 ? 0 : spaceCount - replacedString.length;
             logMessage = logMessage.replace(
                 spaceCount ? `{${expression}:${spaceCount}}` : `{${expression}}`,
-                `${options.console ? `${color}${replacedString}${reset}` : replacedString}${' '.repeat(spaces ?? 0)}`,
+                `${options.console ? `${color}${replacedString}${colors.reset}` : replacedString}${' '.repeat(
+                    spaces ?? 0,
+                )}`,
             );
         }
         return logMessage;
