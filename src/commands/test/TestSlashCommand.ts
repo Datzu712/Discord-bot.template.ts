@@ -1,5 +1,5 @@
-import { createCommand, slashBuilder } from '../../utils/decorators/createCommand';
-import SlashCommand from '../../structures/SlashCommand';
+import { createCommand, slashBuilder } from '../../core/decorators/command.decorator';
+import SlashCommand from '../../core/structures/SlashCommand';
 import { type CommandInteraction } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 

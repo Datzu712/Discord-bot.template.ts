@@ -1,6 +1,6 @@
 import sourcebin from 'sourcebin';
 
-import * as config from '../config/config';
+import * as config from '../../config/config';
 import Client from '../structures/Client';
 
 export default class Util {

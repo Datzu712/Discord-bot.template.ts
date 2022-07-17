@@ -1,9 +1,9 @@
 import { Client as djsClient, type ClientOptions } from 'discord.js';
 import { resolve } from 'path';
 
-import { Logger } from '../structures/Logger';
-import DatabaseConnection from '../database/Database';
-import { clientToken } from '../config/config';
+import { Logger } from './Logger';
+import DatabaseConnection from '../../database/Database';
+import { clientToken } from '../../config/config';
 import EventManager from '../managers/EventManager';
 import CommandManager from '../managers/CommandManager';
 import Util from '../utils/Util';
@@ -48,8 +48,8 @@ export default class Client extends djsClient {
      * @returns { Promise<client> }
      */
     public async setup(): Promise<Client> {
-        await this.commands.importCommands(resolve(__dirname, '../commands'));
-        await this.events.initEvents(resolve(__dirname, '../events'));
+        await this.commands.importCommands(resolve(__dirname, '../../commands'));
+        await this.events.initEvents(resolve(__dirname, '../../events'));
 
         return this;
     }

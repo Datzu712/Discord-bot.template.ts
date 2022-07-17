@@ -1,5 +1,5 @@
-import createEvent from '../utils/decorators/createEvent';
-import { BaseEvent } from '../structures/BaseEvent';
+import createEvent from '../core/decorators/event.decorator';
+import { BaseEvent } from '../core/structures/BaseEvent';
 
 @createEvent({ name: 'ready', target: 'client' })
 export default class Ready extends BaseEvent {

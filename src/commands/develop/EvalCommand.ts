@@ -1,9 +1,11 @@
 import util from 'util';
 import beautify from 'js-beautify';
-import { MessageEmbed } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 
-import { createCommand } from '../../utils/decorators/createCommand';
-import { BaseCommand, type commandExecutionContext } from '../../structures/BaseCommand';
+import { createCommand } from '../../core/decorators/command.decorator';
+import type { Command } from '../../core/interfaces/command.interface';
+import { Msg, Args } from '../../core/decorators';
+import Client from '../../core/structures/Client';
 
 @createCommand({
     name: 'eval',
@@ -12,8 +14,10 @@ import { BaseCommand, type commandExecutionContext } from '../../structures/Base
     aliases: ['e'],
     category: 'dev',
 })
-export default class EvalCommand extends BaseCommand {
-    public async execute({ msg, args }: commandExecutionContext) {
+export default class EvalCommand implements Command {
+    constructor(private client: Client) {}
+
+    async execute(@Msg msg: Message, @Args args: string[]) {
         const startTime = Date.now();
 
         if (!args[0]) return msg.channel.send('Please provide some code to evaluate.');

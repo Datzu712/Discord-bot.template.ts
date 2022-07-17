@@ -9,13 +9,12 @@ services:
     build:
       context: .
       dockerfile: "Dockerfile.${NODE_ENV}"
-    restart: unless-stopped # restart if it is stopped
+    #restart: unless-stopped # restart if it is stopped
     volumes:
       - ./:/bot/
     depends_on:
       - mongodb
 
-  # Mongodb container configuration
   # Mongodb container configuration
   botdb:
     image: mongo:5.0

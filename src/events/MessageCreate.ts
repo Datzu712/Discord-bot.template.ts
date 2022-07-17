@@ -1,5 +1,5 @@
-import createEvent from '../utils/decorators/createEvent';
-import { BaseEvent } from '../structures/BaseEvent';
+import createEvent from '../core/decorators/event.decorator';
+import { BaseEvent } from '../core/structures/BaseEvent';
 import { Message } from 'discord.js';
 
 @createEvent({ name: 'messageCreate', target: 'client' })

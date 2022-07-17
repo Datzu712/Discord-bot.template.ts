@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import { type Logger } from '../structures/Logger';
+import { type Logger } from '../core/structures/Logger';
 import { mongoURI } from '../config/config';
 
 export default class Database {

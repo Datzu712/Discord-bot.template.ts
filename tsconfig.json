@@ -21,11 +21,6 @@
             "src/typings/global.d.ts",
             "node_modules/@types"
         ],
-        "paths": {
-            "*": [
-                "node_modules/*"
-            ]
-        },
         "resolveJsonModule": true,
     },
     "ts-node": {
@@ -34,7 +29,5 @@
     "files": [
         "src/typings/global.d.ts"
     ],
-    "include": [
-        "src/**/*"
-, "test.ts"    ],
+    "include": ["src/**/*"],
 }

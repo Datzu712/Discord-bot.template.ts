@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 
-import type Client from '../../structures/Client';
-import type { commandOptions, BaseCommand } from '../../structures/BaseCommand';
-import type SlashCommand from '../../structures/SlashCommand';
+import type Client from '../structures/Client';
+import type { commandOptions, BaseCommand } from '../structures/BaseCommand';
+import type SlashCommand from '../structures/SlashCommand';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createCommand(data: MakeOptional<commandOptions, 'aliases' | 'cooldown' | 'path'>): any {

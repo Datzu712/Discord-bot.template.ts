@@ -1,5 +1,5 @@
-import type Client from '../../structures/Client';
-import type { eventTarget, BaseEvent } from '../../structures/BaseEvent';
+import type Client from '../structures/Client';
+import type { eventTarget, BaseEvent } from '../structures/BaseEvent';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function createEvent({ name, target }: { name: string; target: eventTarget }): any {
