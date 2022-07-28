@@ -1,5 +1,5 @@
-import { createCommand } from '../../util/decorators/createCommand';
-import { test } from '../../util/decorators/slashBuilder';
+import { createCommand } from '../../utils/decorators/createCommand';
+import { test } from '../../utils/decorators/slashBuilder';
 import { SlashCommand } from '../../structures/SlashCommand';
 import { CommandInteraction, GuildMember } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';

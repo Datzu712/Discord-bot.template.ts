@@ -1,5 +1,5 @@
 import { ChannelCommand, ChannelExecuteContext as context } from '../../structures/ChannelCommand';
-import { createCommand } from '../../util/decorators/createCommand';
+import { createCommand } from '../../utils/decorators/createCommand';
 
 @createCommand({
     name: 'test',

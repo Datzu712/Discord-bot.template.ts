@@ -1,4 +1,4 @@
-import createEvent from '../util/decorators/createEvent';
+import createEvent from '../utils/decorators/createEvent';
 import BaseEvent from '../structures/BaseEvent';
 import { Message } from 'discord.js';
 import prefixModel from '../database/models/guild';

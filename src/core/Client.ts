@@ -1,11 +1,11 @@
 import djs from 'discord.js';
-import Logger from './Logger';
+import { Logger } from './Logger';
 import CategoryManager from '../managers/Categories';
 import CommandManager from '../managers/Commands';
 import Mongodb from '../database/mongoose';
 import EventManager from '../managers/Event';
 import { resolve } from 'path';
-import Util from '../util/Util';
+import Util from '../utils/Util';
 
 import('../structures/Guild');
 import('../structures/Message');
@@ -24,10 +24,12 @@ class Client extends djs.Client {
     constructor(options: djs.ClientOptions) {
         super(options);
 
-        const debug = process.env.NODE_ENV === 'development' ? true : false;
+        const debugAllowed = process.env.NODE_ENV === 'development' ? true : false;
 
-        this.logger = new Logger(resolve(`${__dirname}/../../logs`), debug);
-        this.logger.setTextTemplate('[<dateNow>] [<level>] [<serviceName>] - <message>');
+        this.logger = new Logger({
+            folderPath: resolve(`${__dirname}/../../logs`),
+            debugAllowed,
+        });
 
         this.commands = new CommandManager(this);
         this.categories = new CategoryManager(this);
@@ -53,7 +55,7 @@ class Client extends djs.Client {
                 // It's difficult that the promise be rejected.
                 .catch((err) => this.logger.error(err, 'client'));
         } catch (error) {
-            this.logger.error(error as Error, 'Client');
+            this.logger.error(error, 'Client');
         }
         return this;
     }

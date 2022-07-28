@@ -1,6 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { ChannelCommand, ChannelExecuteContext } from '../../structures/ChannelCommand';
-import { createCommand, OnlyForDevelopers as devsOnly } from '../../util/decorators/createCommand';
+import { createCommand, OnlyForDevelopers as devsOnly } from '../../utils/decorators/createCommand';
 import util from 'util';
 import beautify from 'js-beautify';
 
