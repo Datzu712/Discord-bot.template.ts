@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  
   # Client container configuration
   bot:
     env_file:
@@ -12,19 +11,5 @@ services:
     #restart: unless-stopped # restart if it is stopped
     volumes:
       - ./:/bot/
-    depends_on:
-      - mongodb
-
-  # Mongodb container configuration
-  botdb:
-    image: mongo:5.0
-    env_file:
-      - ./.env
-    container_name: botdb
-    environment:
-      - "MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}"
-      - "MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}"
-      - "MONGO_INITDB_DATABASE=${MONGO_DATABASE-discord-bot}"
-    ports:
-      - "${MONGO_PORT}:${MONGO_PORT}"
+      - /bot/node_modules
     

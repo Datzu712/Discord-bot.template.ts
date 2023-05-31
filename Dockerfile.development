@@ -1,10 +1,8 @@
-FROM node:16.15.1
+FROM node:18.16.0
 
 WORKDIR /bot
 
 COPY package.json .
-
-RUN apt-get -y update && apt-get upgrade -y
 
 RUN npm install
 
